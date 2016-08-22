@@ -1,0 +1,25 @@
+{
+    "name": "exitialis/mas",
+    "description": "Auth server for minecraft client",
+    "authors": [
+        {
+            "name": "Exitialis",
+            "email": "lpexitialis@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0",
+        "laravel/framework": "5.2.*",
+        "illuminate/support": "5.2.*"
+    },
+    "autoload": {
+        "classmap": [
+
+        ],
+        "files": [],
+        "psr-4": {
+            "Exitialis\\Mas": "src/"
+        }
+    }
+}
