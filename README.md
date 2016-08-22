@@ -1,0 +1,2 @@
+# Mas
+Minecraft authentication server
