@@ -19,7 +19,7 @@
         ],
         "files": [],
         "psr-4": {
-            "Exitialis\\Mas": "src/"
+            "Exitialis\\Mas\\": "src/"
         }
     }
 }
