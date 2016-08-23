@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Routing\ResponseFactory;
-use Exitialis\Mas\MasKeys;
+use Exitialis\Mas\MasKey;
 use App\User;
 use Exitialis\Mas\MasKeysGenerator;
 
@@ -20,7 +20,7 @@ class MasLoginController extends Controller
     protected $response;
     protected $generator;
 
-    public function __construct(MasKeys $masKeys, User $user, Request $request, ResponseFactory $response, MasKeysGenerator $generator)
+    public function __construct(MasKey $masKeys, User $user, Request $request, ResponseFactory $response, MasKeysGenerator $generator)
     {
         $this->masKeys = $masKeys;
         $this->user = $user;
@@ -54,7 +54,7 @@ class MasLoginController extends Controller
         {
             if ($masKeys == null)
             {
-                $masKeys = new MasKeys;
+                $masKeys = new MasKey;
                 $uuid = $this->generator->uuidConvert($user->$login_column);
                 $masKeys->uuid = $uuid;
                 $masKeys->user_hash = str_replace("-", "", $uuid);

@@ -9,7 +9,7 @@ class MasServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application services.
      *
-     * @return void
+     * @throws \Exception
      */
     public function boot()
     {

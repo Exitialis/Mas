@@ -1,6 +1,6 @@
 <?php
 
-Route::group([ "prefix" => config("mas.route_prefix"), "namespace" => "Exitialis\Mas\Http\Controllers"], function(){
+Route::group([ "prefix" => config("mas.route_prefix"), "namespace" => "Mas\Http\Controllers"], function(){
     Route::get("/", ["as" => "mas.index", "uses" => "MasClientController@index"]);
 
     Route::post("/join", ["as" => "mas.join", "uses" => "MasClientController@join"]);

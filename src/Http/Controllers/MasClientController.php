@@ -1,56 +1,41 @@
 <?php namespace Exitialis\Mas\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Exitialis\Mas\MasKeysGenerator;
-use Illuminate\Http\Request;
-use Illuminate\Routing\ResponseFactory;
-use Exitialis\Mas\MasKeys;
-use App\User;
+use Exitialis\Mas\MasKey;
 use GuzzleHttp\Client;
-use \Illuminate\Support\Facades\Route;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 class MasClientController extends Controller
 {
-    protected $masKeys;
-    protected $user;
-    protected $request;
-    protected $response;
-    protected $generator;
-
-    public function __construct(MasKeys $masKeys, User $user, Request $request, ResponseFactory $response, MasKeysGenerator $generator)
-    {
-        $this->masKeys = $masKeys;
-        $this->user = $user;
-        $this->request = $request;
-        $this->response = $response;
-        $this->generator = $generator;
-    }
-
-    public function index()
-    {
-        return view("pages.mas");
-    }
-
-    public function join()
+    /**
+     * Обработать эвент входа на сервер.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     */
+    public function join(Request $request)
     {
         $error = array("error" => "Bad login", "errorMessage" => "Bad Login");
-        if(!$this->request->isJson())
-            return $this->response->json(["error" => "wrongFormat", "errorMessage" => "Request format must be a json object"]);
-        $json = $this->request->json();
-        $session = $json->get("accessToken");
-        $selectedProfile = $json->get("selectedProfile");
-        $serverId = $json->get("serverId");
+
+        $session = $request->input("accessToken");
+        $selectedProfile = $request->input("selectedProfile");
+        $serverId = $request->input("serverId");
+
         if (!preg_match("/^[a-zA-Z0-9_-]+$/", $selectedProfile) || !preg_match("/^[a-zA-Z0-9:_-]+$/", $session) || !preg_match("/^[a-zA-Z0-9_-]+$/", $serverId)){
-            return $this->response->json($error);
+            return response()->json($error);
         }
-        $user = $this->masKeys->getUserBySelectedProfile($session, $selectedProfile);
+
+        $user = MasKey::byUserHash($session, $selectedProfile);
+
         if ($user == null)
-            return $this->response->json($error);
+            return response()->json($error);
 
         $user->serverid = $this->request->serverId;
         $user->save();
-        return $this->response->make("", "204");
+
+        return response('', '204');
     }
 
     public function hasJoined()
@@ -59,11 +44,11 @@ class MasClientController extends Controller
         $serverId = $this->request->input("serverId");
         $error = array("error" => "Bad login", "errorMessage" => "Bad Login");
         if (!preg_match("/^[a-zA-Z0-9_-]+$/", $username) || !preg_match("/^[a-zA-Z0-9_-]+$/", $serverId)){
-            return $this->response->json($error);
+            return response()->json($error);
         }
         $user = $this->masKeys->where("username", "=", $username)->where("serverid", "=", $serverId)->first();
         if ($user == null)
-            return $this->response->json(["error" => "Bad login", "errorMessage" => "User not found"]);
+            return response()->json(["error" => "Bad login", "errorMessage" => "User not found"]);
         $realUser = $user->username;
         $request = $this->request->create(config("mas.route_prefix") . "/textures/" . $realUser);
         $textures = Route::dispatch($request)->getContent();
@@ -90,11 +75,11 @@ class MasClientController extends Controller
     {
         $error = array("error" => "Bad login", "errorMessage" => "Bad Login");
         if (!preg_match("/^[a-zA-Z0-9_-]+$/", $user_hash)){
-            return $this->response->json($error);
+            return response()->json($error);
         }
         $user = $this->masKeys->where("user_hash", "=", $user_hash)->first();
         if ($user == null)
-            return $this->response->json($error);
+            return response()->json($error);
         $realUser = $user->username;
         $time = time();
         $textures = $this->request->create(config("mas.route_prefix" . "/textures/" . $realUser));

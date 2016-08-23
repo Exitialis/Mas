@@ -1,25 +1,23 @@
 {
     "name": "exitialis/mas",
     "description": "Auth server for minecraft client",
+    "license": "GNU GPL v3",
+    "homepage": "https://github.com/exitialis/mas",
     "authors": [
         {
             "name": "Exitialis",
             "email": "lpexitialis@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
         "laravel/framework": "5.2.*",
         "illuminate/support": "5.2.*"
     },
     "autoload": {
-        "classmap": [
-
-        ],
-        "files": [],
         "psr-4": {
             "Exitialis\\Mas\\": "src/"
-        }
+        },
+        "files": ["src/helpers.php"]
     }
 }

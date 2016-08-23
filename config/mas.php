@@ -2,6 +2,10 @@
 
 return [
 
+    'users' => [
+        'model' => App\User::class,
+    ],
+
     'route_prefix' => 'lk/mas',
     'hash' => 'wp',
     'user' => [

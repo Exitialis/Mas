@@ -1,12 +1,15 @@
-<?php namespace Exitialis\Mas;
+<?php
 
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
+if ( ! function_exists('HashPassword')) {
 
-class MasKeysGenerator
-{
-
-    public function HashPassword($password, $realPass)
+    /**
+     * Захешировать пароль.
+     *
+     * @param $password
+     * @param $realPass
+     * @return string
+     */
+    function HashPassword($password, $realPass)
     {
         $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         $cryptPass = '*0';
@@ -60,8 +63,17 @@ class MasKeysGenerator
 
         return $cryptPass;
     }
+}
 
-    public function uuidFromString($string)
+if ( ! function_exists('uuidFromString')) {
+
+    /**
+     * Получить uuid v4 из строки.
+     *
+     * @param $string
+     * @return string
+     */
+    function uuidFromString($string)
     {
         $val = md5($string, true);
         $byte = array_values(unpack('C16', $val));
@@ -88,14 +100,16 @@ class MasKeysGenerator
         );
         return $uuid;
     }
+}
 
-    function uuidConvert($string)
-    {
-        $string = $this->uuidFromString("OfflinePlayer:".$string);
-        return $string;
-    }
+if ( ! function_exists('generateStr')) {
 
-    public function generateStr() {
+    /**
+     * Сгенерировать особую строку.
+     *
+     * @return null|string
+     */
+    function generateStr() {
         $chars="0123456789abcdef";
         $max=64;
         $size=StrLen($chars)-1;
@@ -105,24 +119,42 @@ class MasKeysGenerator
 
         return $password;
     }
+}
 
-    public function hashc($client) {
-        $client_path = config("mas.path.clients");
-        $hash_md5 = str_replace("\\", "/",$this->checkfiles($client_path . '/' .$client.'/bin/').$this->checkfiles($client_path . '/'.$client.'/mods/').$this->checkfiles($client_path . '/' .$client.'/coremods/').$this->checkfiles($client_path . '/' .$client.'/natives/')).'<::>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
-        return $hash_md5;
-    }
+if ( ! function_exists('check_files')) {
 
-    public function checkfiles($path) {
+    /**
+     * Проверить файлы клиента на соответствие.
+     *
+     * @param $path
+     * @return string
+     */
+    function checkfiles($path) {
         $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
         $massive = "";
         foreach($objects as $name => $object) {
             $basename = basename($name);
             $isdir = is_dir($name);
-            if ($basename!="." and $basename!=".." and !is_dir($name)){
+            if ($basename!="." and $basename!=".." and !$isdir){
                 $str = str_replace('clients/', "", str_replace($basename, "", $name));
                 $massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name).'<:>';
             }
         }
         return $massive;
+    }
+}
+
+if ( ! function_exists('hashc')) {
+
+    /**
+     * 
+     *
+     * @param $client
+     * @return string
+     */
+    function hashc($client) {
+        $client_path = config("mas.path.clients");
+        $hash_md5 = str_replace("\\", "/",$this->checkfiles($client_path . '/' .$client.'/bin/').$this->checkfiles($client_path . '/'.$client.'/mods/').$this->checkfiles($client_path . '/' .$client.'/coremods/').$this->checkfiles($client_path . '/' .$client.'/natives/')).'<::>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
+        return $hash_md5;
     }
 }
