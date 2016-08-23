@@ -27,7 +27,7 @@ class MasClientController extends Controller
             return response()->json($error);
         }
 
-        $user = MasKey::byUserHash($session, $selectedProfile);
+        $user = MasKey::byUserHash($session);
 
         if ($user == null)
             return response()->json($error);

@@ -14,21 +14,6 @@ use Exitialis\Mas\MasKeysGenerator;
 class MasLoginController extends Controller
 {
 
-    protected $masKeys;
-    protected $user;
-    protected $request;
-    protected $response;
-    protected $generator;
-
-    public function __construct(MasKey $masKeys, User $user, Request $request, ResponseFactory $response, MasKeysGenerator $generator)
-    {
-        $this->masKeys = $masKeys;
-        $this->user = $user;
-        $this->request = $request;
-        $this->response = $response;
-        $this->generator = $generator;
-    }
-
     public function auth($login, $password)
     {
         $login_column = config("mas.user.login_column");

@@ -13,10 +13,10 @@ Route::group([ "prefix" => config("mas.route_prefix"), "namespace" => "Mas\Http\
 
     Route::get("/server", ["as" => "mas.server", "uses" => "MasClientController@server"]);
 
-    Route::get("/auth/{login}/{password}", ["as" => "mas.auth", "uses" => "MasLoginController@auth"]);
-    Route::get("/refresh", ["as" => "mas.refresh", "uses" => "MasLoginController@refresh"]);
-    Route::get("/validate", ["as" => "mas.validate", "uses" => "MasLoginController@MasValidate"]);
-    Route::get("/invalidate", ["as" => "mas.invalidate", "uses" => "MasLoginController@invalidate"]);
+    Route::post("auth", ["as" => "mas.auth", "uses" => "MasLoginController@auth"]);
+    Route::get("refresh", ["as" => "mas.refresh", "uses" => "MasLoginController@refresh"]);
+    Route::get("validate", ["as" => "mas.validate", "uses" => "MasLoginController@MasValidate"]);
+    Route::get("invalidate", ["as" => "mas.invalidate", "uses" => "MasLoginController@invalidate"]);
 
 
 });

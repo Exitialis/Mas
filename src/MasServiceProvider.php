@@ -36,8 +36,5 @@ class MasServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/mas.php', 'mas');
 
-        $this->app->bind("Mas", function($app){
-           return new Mas;
-        });
     }
 }
