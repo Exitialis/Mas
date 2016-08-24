@@ -3,7 +3,7 @@
     "description": "Auth server for minecraft client",
     "license": "GNU GPL v3",
     "homepage": "https://github.com/exitialis/mas",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "authors": [
         {
             "name": "Exitialis",
@@ -13,7 +13,8 @@
     "require": {
         "php": ">=5.4.0",
         "laravel/framework": "^5.2.43",
-        "illuminate/support": "^5.2.43"
+        "illuminate/support": "^5.2.43",
+        "hautelook/phpass": "^1.0"
     },
     "autoload": {
         "psr-4": {
