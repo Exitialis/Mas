@@ -2,6 +2,8 @@
 
 namespace Exitialis\Mas\Managers;
 
+use Exitialis\Mas\User;
+use Hautelook\Phpass\PasswordHash;
 use Illuminate\Database\Eloquent\Model;
 
 class AuthManager
@@ -10,29 +12,30 @@ class AuthManager
     /**
      * Проверить пароль на правильность.
      *
-     * @param Model $user
+     * @param User $user
      * @param $password
      * @return bool
      */
-    public function checkPassword(Model $user, $password)
+    public function checkPassword(User $user, $password)
     {
-        $password_column = config('mas.repositories.user.password_column');
         $hash = config('mas.hash');
 
-        $realPass = $user->$password_column;
+        $realPass = $user->password;
+
+        $hasher = new PasswordHash(8, false);
 
          switch ($hash) {
             case 'wp':
-                $bool = $realPass == hash_password($password, $realPass);
+                return $hasher->CheckPassword($password, $realPass);
                 break;
             case 'dle':
                 $bool = $realPass == md5(md5($password));
                 break;
             default:
-                $bool = $realPass == hash_password($password, $realPass);
+                return $hasher->CheckPassword($password, $realPass);
                 break;
         }
 
-        return $bool;
+        return false;
     }
 }

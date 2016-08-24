@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class User extends Model
 {
     /**
+     * Первичный ключ в таблице пользователей.
+     *
+     * @var int
+     */
+    protected $primaryKey;
+    /**
      * Имя таблицы с пользователями в базе данных.
      *
      * @var string
@@ -23,6 +29,7 @@ class User extends Model
         parent::__construct($attributes);
 
         $this->table = config('mas.repositories.user.table_name');
+        $this->primaryKey = config('mas.repositories.user.key');
     }
     
     /**
@@ -35,10 +42,10 @@ class User extends Model
     {
         if ($key == 'login') {
             $login_column = config('mas.repositories.user.login_column');
-            return $this->$login_column;
+            return $this->attributesToArray()[$login_column];
         } elseif ($key == 'password') {
             $password_column = config('mas.repositories.user.password_column');
-            return $this->$password_column;
+            return $this->attributesToArray()[$password_column];
         }
 
         parent::__get($key);

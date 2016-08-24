@@ -44,6 +44,6 @@ abstract class BaseRepository
             throw new Exception('Model must be instance of model');
         }
 
-        return $this->model = $model;
+        return $this->model = $model->newQuery();
     }
 }
