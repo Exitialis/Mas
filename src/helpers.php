@@ -1,6 +1,6 @@
 <?php
 
-if ( ! function_exists('HashPassword')) {
+if ( ! function_exists('hash_password')) {
 
     /**
      * Захешировать пароль.
@@ -9,7 +9,7 @@ if ( ! function_exists('HashPassword')) {
      * @param $realPass
      * @return string
      */
-    function HashPassword($password, $realPass)
+    function hash_password($password, $realPass)
     {
         $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         $cryptPass = '*0';

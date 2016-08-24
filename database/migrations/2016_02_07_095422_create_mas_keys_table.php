@@ -16,13 +16,14 @@ class CreateMasKeysTable extends Migration
         Schema::create('mas_keys', function(Blueprint $table){
             $table->increments("id");
             $table->timestamps();
-            $table->bigInteger("user_id"); // For integration with User model
+            $table->integer("user_id")->unsigned(); // For integration with User model
             $table->string("username");
-            $table->char("uuid", 36);
+            $table->uuid('uuid');
             $table->string("session");
             $table->string("serverid");
             $table->string("HID");
             $table->string("pass"); //token sashok, remembering user pass
+            $table->string("user_hash")->nullable();
         });
     }
 

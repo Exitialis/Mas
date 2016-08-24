@@ -2,67 +2,74 @@
 
 namespace Exitialis\Mas\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Illuminate\Routing\ResponseFactory;
+use App\Http\Requests;
+use Exitialis\Mas\Managers\AuthManager;
 use Exitialis\Mas\MasKey;
-use App\User;
-use Exitialis\Mas\MasKeysGenerator;
+use Exitialis\Mas\Repositories\KeyRepository;
+use Exitialis\Mas\Repositories\UserRepository;
+use Illuminate\Http\Request;
 
 class MasLoginController extends Controller
 {
+    /**
+     * Репозиторий пользователей.
+     *
+     * @var UserRepository
+     */
+    protected $users;
 
-    public function auth($login, $password)
+    /**
+     * Менеджер авторизации пользователя.
+     *
+     * @var AuthManager
+     */
+    protected $auth;
+
+    /**
+     * Репозиторий ключей пользователя.
+     *
+     * @var KeyRepository
+     */
+    protected $keys;
+
+    /**
+     * MasLoginController constructor.
+     * @param UserRepository $users
+     * @param KeyRepository $keys
+     */
+    public function __construct(UserRepository $users, KeyRepository $keys)
     {
-        $login_column = config("mas.user.login_column");
-        $password_column = config("mas.user.password_column");
-        $hash = config('mas.hash');
-        $user = $this->user->where($login_column, "=", $login)->with('MasKeys')->first();
-        if ($user == null)
-            return $this->response->make("false");
-        $realPass = $user->$password_column;
-        $masKeys = $user->MasKeys;
-        switch ($hash) {
-            case 'wp':
-                $bool = $realPass == $this->generator->HashPassword($password, $realPass);
-                break;
-            case 'dle':
-                $bool = $realPass == md5(md5($password));
-                break;
-            default:
-                $bool = $realPass == $this->generator->HashPassword($password, $realPass);        
-                break;
+        $this->users = $users;
+        $this->keys = $keys;
+        $this->auth = new AuthManager;
+    }
+
+    /**
+     * Проверка данных пользователя в лаунчере.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function auth(Request $request)
+    {
+        $this->validate($request, [
+            'login' => 'required|string',
+            'password' => 'required|string'
+        ]);
+
+        if ( ! $user = $this->users->findByLogin($request->input('login'))) {
+            return response('User not found');
         }
-        if ($bool)
+
+        if ($this->auth->checkPassword($user, $request->input('password')))
         {
-            if ($masKeys == null)
-            {
-                $masKeys = new MasKey;
-                $uuid = $this->generator->uuidConvert($user->$login_column);
-                $masKeys->uuid = $uuid;
-                $masKeys->user_hash = str_replace("-", "", $uuid);
-                $masKeys->session = $this->generator->generateStr();
-                $masKeys->user_id = $user->{$user->getKeyName()};
-                $masKeys->username = $user->$login_column;
-                $masKeys->save();
-                return $this->response->make($uuid . "::" . $masKeys->session);
-            }
-            else
-            {
-                $masKeys->session = $this->generator->generateStr(); // Regenerate session
-                $user_hash = $masKeys->user_hash;
-                $uuid = $masKeys->uuid;
-                if ($user_hash != str_replace("-", "", $uuid))
-                    $masKeys->user_hash = str_replace("-", "", $uuid);
-                $masKeys->save();
+            $key = $this->keys->save($this->keys->findOrCreateByUser($user), $user);
 
-                return $this->response->make($masKeys->uuid . "::" . $masKeys->session);
-            }
-
+            return response($key->uuid . "::" . $key->session);
         }
-        return $this->response->make("false");
+
+        return response('false');
     }
 
     public function refresh()

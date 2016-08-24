@@ -7,10 +7,19 @@ return [
     ],
 
     'route_prefix' => 'lk/mas',
+
+    /**
+     * Available hashes:
+     * wp, dle
+     */
     'hash' => 'wp',
-    'user' => [
-        'login_column' => 'user_login',
-        'password_column' => 'user_pass',
+
+    'repositories' => [
+        'user' => [
+            'login_column' => 'user_login',
+            'password_column' => 'user_pass',
+            'table_name' => 'bjsvyp8zhw_users',
+        ],
     ],
 
     'path' => [
