@@ -61,7 +61,7 @@ class MasLoginController extends Controller
         if ( ! $user = $this->users->findByLogin($request->input('login'))) {
             return response('User not found');
         }
-
+        
         if ($this->auth->checkPassword($user, $request->input('password')))
         {
             $key = $this->keys->save($this->keys->findOrCreateByUser($user), $user);
