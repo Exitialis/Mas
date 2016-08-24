@@ -20,9 +20,9 @@ class CreateMasKeysTable extends Migration
             $table->string("username");
             $table->uuid('uuid');
             $table->string("session");
-            $table->string("serverid");
-            $table->string("HID");
-            $table->string("pass"); //token sashok, remembering user pass
+            $table->string("serverid")->nullable();
+            $table->string("HID")->nullable();
+            $table->string("pass")->nullable(); //token sashok, remembering user pass
             $table->string("user_hash")->nullable();
         });
     }

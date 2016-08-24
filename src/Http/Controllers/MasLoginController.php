@@ -72,17 +72,20 @@ class MasLoginController extends Controller
         return response('false');
     }
 
-    public function refresh()
+    /**
+     * Обновить accessToken для пользователя.
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function refresh(Request $request)
     {
         $error = array("error" => "Bad login", "errorMessage" => "Bad Login");
-        if(!$this->request->isJson())
-            return $this->response->json($error);
-        $json = $this->request->json();
-        $session = $json->accessToken;
-        $uuid = $json->clientToken;
-        if (!preg_match("/^[a-zA-Z0-9_-]+$/", $uuid) || !preg_match("/^[a-zA-Z0-9:_-]+$/", $session)){
-            return $this->response->json($error);
-        }
+
+
+        $session = $request->input('accessToken');
+        $uuid = $request->input('clientToken');
+
         $user = $this->masKeys->getUser($session, $uuid);
         $session = $this->generator->generateStr();
         $user->session = $session;
@@ -90,14 +93,13 @@ class MasLoginController extends Controller
         return $this->response->json(["accessToken" => $session, "clientToken" => $uuid]);
     }
 
-    public function MasValidate()
+    public function MasValidate(Request $request)
     {
         $error = array("error" => "Bad login", "errorMessage" => "Bad Login");
-        if(!$this->request->isJson())
-            return $this->response->json($error);
+
         $json = $this->request->json();
-        $session = $json->accessToken;
-        $uuid = $json->clientToken;
+        $session = $request->input('accessToken');
+        $uuid = $request->input('clientToken');
         $user = $this->masKeys->where("uuid", "=", $uuid);
         if ($user == null)
             return $this->response->json($error);
@@ -109,8 +111,4 @@ class MasLoginController extends Controller
 
     }
 
-    public function invalidate()
-    {
-
-    }
 }

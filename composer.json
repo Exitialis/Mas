@@ -3,7 +3,7 @@
     "description": "Auth server for minecraft client",
     "license": "GNU GPL v3",
     "homepage": "https://github.com/exitialis/mas",
-    "version": "0.0.3",
+    "version": "0.1.0",
     "authors": [
         {
             "name": "Exitialis",
