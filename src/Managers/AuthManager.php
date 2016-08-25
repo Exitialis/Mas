@@ -29,7 +29,7 @@ class AuthManager
                 return $hasher->CheckPassword($password, $realPass);
                 break;
             case 'dle':
-                $bool = $realPass == md5(md5($password));
+                return $realPass === md5(md5($password));
                 break;
             default:
                 return $hasher->CheckPassword($password, $realPass);
