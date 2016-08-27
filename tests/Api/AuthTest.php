@@ -2,11 +2,21 @@
 
 namespace Exitialis\Tests;
 
-class AuthTest extends DbTestCase
+use Illuminate\Foundation\Testing\TestCase;
+use Mockery\Mock;
+
+class AuthTest extends MasTestCase
 {
-    
+    public function setUp()
+    {
+        parent::setUp();
+    }
+
+
     public function testAuthSuccessWithRightCredentials()
     {
+        Mock::
+
         $this->assertTrue(true);
     }
     

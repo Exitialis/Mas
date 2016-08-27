@@ -6,7 +6,7 @@ return [
         'model' => App\User::class,
     ],
 
-    'route_prefix' => 'lk/mas',
+    'route_prefix' => 'mas',
 
     /**
      * Available hashes:
