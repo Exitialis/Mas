@@ -2,12 +2,44 @@
 
 namespace Exitialis\Mas\Managers;
 
+use Exitialis\Mas\Repositories\UserRepository;
 use Exitialis\Mas\User;
 use Hautelook\Phpass\PasswordHash;
-use Illuminate\Database\Eloquent\Model;
 
 class AuthManager
 {
+
+    /**
+     * Репозиторий пользователей.
+     *
+     * @var UserRepository
+     */
+    protected $users;
+
+    /**
+     * AuthManager constructor.
+     * @param UserRepository $users
+     */
+    public function __construct(UserRepository $users)
+    {
+        $this->users = $users;
+    }
+
+    /**
+     * Авторизовать пользователя по его данным.
+     *
+     * @param $login
+     * @param $password
+     * @return bool
+     */
+    public function login($login, $password)
+    {
+        if ( ! $user = $this->users->findByLogin($login)) {
+            return false;
+        }
+
+        return $this->checkPassword($user, $password);
+    }
 
     /**
      * Проверить пароль на правильность.
