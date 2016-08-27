@@ -58,8 +58,7 @@ class MasLoginController extends Controller
             'password' => 'required|string'
         ]);
 
-        if ($this->auth->login($request->input('login'), $request->input('password')))
-        {
+        if ($this->auth->login($request->input('login'), $request->input('password')))  {
             $key = $this->keys->save($this->keys->findOrCreateByUser($user), $user);
 
             return response($key->uuid . "::" . $key->session);

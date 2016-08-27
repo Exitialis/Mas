@@ -15,13 +15,19 @@
         "illuminate/support": "^5.2.43",
         "hautelook/phpass": "^1.0"
     },
-    "autoload": {
+    "require-dev": {
+        "laravel/laravel": "dev-develop",
+        "phpunit/phpunit": "^5.5"
+    },
+  "autoload": {
         "psr-4": {
             "Exitialis\\Mas\\": "src/"
         },
         "files": ["src/helpers.php"]
     },
-    "require-dev": {
-        "phpunit/phpunit": "^5.5"
+    "autoload-dev": {
+      "psr-4": {
+        "Exitialis\\Tests\\": "tests/"
+      }
     }
 }
