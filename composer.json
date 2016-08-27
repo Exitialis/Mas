@@ -20,5 +20,8 @@
             "Exitialis\\Mas\\": "src/"
         },
         "files": ["src/helpers.php"]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.5"
     }
 }
