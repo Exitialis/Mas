@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Exitialis\Mas\Repositories\Contracts;
+namespace Exitialis\Mas\Repository\Contracts;
 
 /**
  * Interface RepositoryInterface
@@ -35,15 +35,7 @@ interface RepositoryInterface
      * @return mixed
      */
     public function paginate($limit = null, $columns = ['*']);
-    /**
-     * Retrieve all data of repository, simple paginated
-     *
-     * @param null  $limit
-     * @param array $columns
-     *
-     * @return mixed
-     */
-    public function simplePaginate($limit = null, $columns = ['*']);
+
     /**
      * Find data by id
      *
@@ -181,20 +173,4 @@ interface RepositoryInterface
      * @return array
      */
     public function getFieldsSearchable();
-    /**
-     * Set Presenter
-     *
-     * @param $presenter
-     *
-     * @return mixed
-     */
-    public function setPresenter($presenter);
-    /**
-     * Skip Presenter Wrapper
-     *
-     * @param bool $status
-     *
-     * @return $this
-     */
-    public function skipPresenter($status = true);
 }

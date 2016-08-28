@@ -1,9 +1,13 @@
 <?php
 
-namespace Exitialis\Mas\Repositories;
+namespace Exitialis\Mas\Repository\Eloquent;
+
+use Exitialis\Mas\User;
+use Illuminate\Foundation\Application;
 
 class UserRepository extends BaseRepository
 {
+
     /**
      * Имя колонки пользователя в базе данных.
      *
@@ -20,15 +24,26 @@ class UserRepository extends BaseRepository
 
     /**
      * UserRepository constructor.
-     * @param string $modelName
+     *
+     * @param Application $app
      * @param array $config
      */
-    public function __construct($modelName, array $config)
+    public function __construct(Application $app, array $config)
     {
-        parent::__construct($modelName);
+        parent::__construct($app);
 
         $this->loginColumn = $config['login_column'];
         $this->passwordColumn = $config['password_column'];
+    }
+
+    /**
+     * Задать класс для модели репозитория.
+     *
+     * @return mixed
+     */
+    public function model()
+    {
+        return User::class;
     }
 
     /**
@@ -39,6 +54,6 @@ class UserRepository extends BaseRepository
      */
     public function findByLogin($login)
     {
-        return $this->model->where($this->loginColumn, $login)->first();
+        return $this->findWhere([$this->loginColumn, $login]);
     }
 }

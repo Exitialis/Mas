@@ -1,16 +1,16 @@
 <?php
 
-namespace Prettus\Repository\Eloquent;
+namespace Exitialis\Mas\Repository\Eloquent;
 
 use Closure;
-use Exception;
-use Exitialis\Mas\Repositories\Contracts\RepositoryInterface;
+use Exitialis\Mas\Exceptions\RepositoryException;
+use Exitialis\Mas\Repository\Contracts\RepositoryInterface;
 use Illuminate\Container\Container as Application;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Exitialis\Mas\Exceptions\RepositoryException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class BaseRepository
@@ -33,14 +33,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected $fieldSearchable = [];
     
-    
-    /**
-     * Validation Rules
-     *
-     * @var array
-     */
-    protected $rules = null;
-    
     /**
      * @var \Closure
      */
@@ -53,11 +45,11 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->app = $app;
         $this->makeModel();
-        $this->boot();
     }
 
-
     /**
+     * Обновить модель.
+     *
      * @throws RepositoryException
      */
     public function resetModel()
@@ -66,27 +58,31 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * Specify Model class name
+     * Установить класс модели.
      *
      * @return string
      */
     abstract public function model();
 
     /**
+     * Создать инстанс модели.
+     *
      * @return Model
      * @throws RepositoryException
      */
     public function makeModel()
     {
         $model = $this->app->make($this->model());
-        if (!$model instanceof Model) {
+
+        if ( ! $model instanceof Model) {
             throw new RepositoryException("Class {$this->model()} must be an instance of Illuminate\\Database\\Eloquent\\Model");
         }
+
         return $this->model = $model;
     }
 
     /**
-     * Get Searchable Fields
+     * Поулчить поля, доступные для поиска.
      *
      * @return array
      */
@@ -96,105 +92,90 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * Query Scope
+     * Установить scope.
      *
      * @param \Closure $scope
-     *
      * @return $this
      */
     public function scopeQuery(\Closure $scope)
     {
         $this->scopeQuery = $scope;
+
         return $this;
     }
 
     /**
-     * Retrieve data array for populate field select
+     * Получить ассоциативный массив данных из полей.
      *
      * @param string      $column
      * @param string|null $key
-     *
      * @return \Illuminate\Support\Collection|array
      */
     public function lists($column, $key = null)
     {
-        $this->applyCriteria();
-
-        return $this->model->lists($column, $key);
+        return $this->model->pluck($column, $key);
     }
 
     /**
-     * Retrieve all data of repository
+     * Получить все сущности из базы.
      *
      * @param array $columns
-     *
      * @return mixed
      */
     public function all($columns = ['*'])
     {
-        $this->applyCriteria();
         $this->applyScope();
+
         if ($this->model instanceof Builder) {
             $results = $this->model->get($columns);
         } else {
             $results = $this->model->all($columns);
         }
+
         $this->resetModel();
         $this->resetScope();
-        return $this->parserResult($results);
+
+        return $results;
     }
 
     /**
-     * Retrieve first data of repository
+     * Получить первый элемент из репозитория.
      *
      * @param array $columns
-     *
      * @return mixed
      */
     public function first($columns = ['*'])
     {
-        $this->applyCriteria();
         $this->applyScope();
+
         $results = $this->model->first($columns);
+
         $this->resetModel();
-        return $this->parserResult($results);
+
+        return $results;
     }
 
     /**
-     * Retrieve all data of repository, paginated
+     * Получить пагинацию данных из репозитория.
      *
-     * @param null   $limit
-     * @param array  $columns
-     * @param string $method
-     *
-     * @return mixed
-     */
-    public function paginate($limit = null, $columns = ['*'], $method = "paginate")
-    {
-        $this->applyCriteria();
-        $this->applyScope();
-        $limit = is_null($limit) ? config('repository.pagination.limit', 15) : $limit;
-        $results = $this->model->{$method}($limit, $columns);
-        $results->appends(app('request')->query());
-        $this->resetModel();
-        return $this->parserResult($results);
-    }
-
-    /**
-     * Retrieve all data of repository, simple paginated
-     *
-     * @param null  $limit
+     * @param null $limit
      * @param array $columns
      *
      * @return mixed
      */
-    public function simplePaginate($limit = null, $columns = ['*'])
+    public function paginate($limit = null, $columns = ['*'])
     {
-        return $this->paginate($limit, $columns, "simplePaginate");
+        $this->applyScope();
+        $limit = is_null($limit) ? 15 : $limit;
+
+        $results = $this->model->paginate($limit, $columns);
+
+        $this->resetModel();
+        return $results;
     }
 
     /**
-     * Find data by id
+     * Найти сущность по id.
      *
      * @param       $id
      * @param array $columns
@@ -203,51 +184,72 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function find($id, $columns = ['*'])
     {
-        $this->applyCriteria();
         $this->applyScope();
-        $model = $this->model->findOrFail($id, $columns);
+
+        $model = $this->model->find($id, $columns);
+
         $this->resetModel();
-        return $this->parserResult($model);
+        return $model;
     }
 
     /**
-     * Find data by field and value
+     * Найти сущность по id, или выбросить исключение.
+     *
+     * @throws NotFoundHttpException
+     *
+     * @param       $id
+     * @param array $columns
+     *
+     * @return mixed
+     */
+    public function findOrFail($id, $columns = ['*'])
+    {
+        $this->applyScope();
+
+        $model = $this->model->findOrFail($id, $columns);
+
+        $this->resetModel();
+        return $model;
+    }
+
+    /**
+     * Найти сущности по полю.
      *
      * @param       $field
      * @param       $value
      * @param array $columns
-     *
      * @return mixed
      */
     public function findByField($field, $value = null, $columns = ['*'])
     {
-        $this->applyCriteria();
         $this->applyScope();
-        $model = $this->model->where($field, '=', $value)->get($columns);
+
+        $model = $this->model->where($field, $value)->get($columns);
+
         $this->resetModel();
-        return $this->parserResult($model);
+        return $model;
     }
 
     /**
-     * Find data by multiple fields
+     * Найти данные по нескольким полям.
      *
      * @param array $where
      * @param array $columns
-     *
      * @return mixed
      */
     public function findWhere(array $where, $columns = ['*'])
     {
-        $this->applyCriteria();
         $this->applyScope();
         $this->applyConditions($where);
-        $model = $this->model->get($columns);
+
+        $model = $this->model->first($columns);
         $this->resetModel();
-        return $this->parserResult($model);
+
+        return $model;
     }
 
     /**
-     * Find data by multiple values in one field
+     * Найти данные по значениям.
      *
      * @param       $field
      * @param array $values
@@ -257,14 +259,14 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function findWhereIn($field, array $values, $columns = ['*'])
     {
-        $this->applyCriteria();
-        $model = $this->model->whereIn($field, $values)->get($columns);
+        $model = $this->model->whereIn($field, $values)->first($columns);
         $this->resetModel();
-        return $this->parserResult($model);
+
+        return $model;
     }
 
     /**
-     * Find data by excluding multiple values in one field
+     * Найти данные по исключению множества значений.
      *
      * @param       $field
      * @param array $values
@@ -274,10 +276,10 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function findWhereNotIn($field, array $values, $columns = ['*'])
     {
-        $this->applyCriteria();
-        $model = $this->model->whereNotIn($field, $values)->get($columns);
+        $model = $this->model->whereNotIn($field, $values)->first($columns);
         $this->resetModel();
-        return $this->parserResult($model);
+
+        return $model;
     }
 
     /**
@@ -305,7 +307,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function update(array $attributes, $id)
     {
-        $model = $this->model->findOrFail($id);
+        $model = $this->findOrFail($id);
 
         $model->update($attributes);
 
@@ -360,9 +362,9 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->applyScope();
 
-        $model = $this->model->where($where)->first();
+        $this->applyConditions($where);
 
-        $deleted = $model->delete();
+        $deleted = $this->model->delete();
 
         $this->resetModel();
 
@@ -418,6 +420,7 @@ abstract class BaseRepository implements RepositoryInterface
     public function hidden(array $fields)
     {
         $this->model->setHidden($fields);
+
         return $this;
     }
 
@@ -431,6 +434,7 @@ abstract class BaseRepository implements RepositoryInterface
     public function orderBy($column, $direction = 'asc')
     {
         $this->model = $this->model->orderBy($column, $direction);
+
         return $this;
     }
 
@@ -475,7 +479,21 @@ abstract class BaseRepository implements RepositoryInterface
         return $this;
     }
 
-
-
-
+    /**
+     * Применить условия к модели.
+     *
+     * @param array $where
+     * @return void
+     */
+    protected function applyConditions(array $where)
+    {
+        foreach ($where as $field => $value) {
+            if (is_array($value)) {
+                list($field, $condition, $val) = $value;
+                $this->model = $this->model->where($field, $condition, $val);
+            } else {
+                $this->model = $this->model->where($field, '=', $value);
+            }
+        }
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Exitialis\Mas\Repositories;
+namespace Exitialis\Mas\Repository\Eloquent;
 
 use Exitialis\Mas\MasKey;
 use Exitialis\Mas\User;
