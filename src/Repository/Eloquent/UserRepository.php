@@ -2,10 +2,11 @@
 
 namespace Exitialis\Mas\Repository\Eloquent;
 
+use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
 use Exitialis\Mas\User;
 use Illuminate\Foundation\Application;
 
-class UserRepository extends BaseRepository
+class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
 
     /**

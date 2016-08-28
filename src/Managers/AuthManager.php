@@ -2,7 +2,8 @@
 
 namespace Exitialis\Mas\Managers;
 
-use Exitialis\Mas\Repositories\UserRepository;
+use Exitialis\Mas\Repository\Contracts\RepositoryInterface;
+use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
 use Exitialis\Mas\User;
 use Hautelook\Phpass\PasswordHash;
 
@@ -12,17 +13,27 @@ class AuthManager
     /**
      * Репозиторий пользователей.
      *
-     * @var UserRepository
+     * @var UserRepositoryInterface
      */
     protected $users;
 
     /**
-     * AuthManager constructor.
-     * @param UserRepository $users
+     * Ключи пользователя.
+     *
+     * @var RepositoryInterface
      */
-    public function __construct(UserRepository $users)
+    protected $keys;
+
+    /**
+     * AuthManager constructor.
+     *
+     * @param UserRepositoryInterface $users
+     * @param RepositoryInterface $keys
+     */
+    public function __construct(UserRepositoryInterface $users, RepositoryInterface $keys)
     {
         $this->users = $users;
+        $this->keys = $keys;
     }
 
     /**
@@ -38,7 +49,11 @@ class AuthManager
             return false;
         }
 
-        return $this->checkPassword($user, $password);
+        if ($this->checkPassword($user, $password)) {
+            return $this->keys->save($this->keys->findByField('user_id', $user->id), $user);
+        }
+
+        return false;
     }
 
     /**

@@ -3,22 +3,13 @@
 namespace Exitialis\Mas\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests;
 use Exitialis\Mas\Managers\AuthManager;
 use Exitialis\Mas\MasKey;
-use Exitialis\Mas\Repositories\KeyRepository;
-use Exitialis\Mas\Repositories\UserRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MasLoginController extends Controller
 {
-    /**
-     * Репозиторий пользователей.
-     *
-     * @var UserRepository
-     */
-    protected $users;
-
     /**
      * Менеджер авторизации пользователя.
      *
@@ -27,22 +18,12 @@ class MasLoginController extends Controller
     protected $auth;
 
     /**
-     * Репозиторий ключей пользователя.
-     *
-     * @var KeyRepository
-     */
-    protected $keys;
-
-    /**
      * MasLoginController constructor.
-     * @param UserRepository $users
-     * @param KeyRepository $keys
+     * @param AuthManager $auth
      */
-    public function __construct(UserRepository $users, KeyRepository $keys)
+    public function __construct(AuthManager $auth)
     {
-        $this->users = $users;
-        $this->keys = $keys;
-        $this->auth = new AuthManager;
+        $this->auth = $auth;
     }
 
     /**
@@ -58,13 +39,11 @@ class MasLoginController extends Controller
             'password' => 'required|string'
         ]);
 
-        if ($this->auth->login($request->input('login'), $request->input('password')))  {
-            $key = $this->keys->save($this->keys->findOrCreateByUser($user), $user);
-
-            return response($key->uuid . "::" . $key->session);
+        if ( ! $key = $this->auth->login($request->input('login'), $request->input('password'))) {
+            return response('false');
         }
 
-        return response('false');
+        return response($key->uuid . "::" . $key->session);
     }
 
     /**

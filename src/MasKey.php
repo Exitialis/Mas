@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class MasKey extends Model
 {
     /**
+     * Разрешено массовое заполнение всех полей.
+     *
+     * @var array
+     */
+    public $guarded = [];
+
+    /**
      * Имеет пользователя.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

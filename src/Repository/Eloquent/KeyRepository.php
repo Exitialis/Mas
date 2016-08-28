@@ -3,44 +3,17 @@
 namespace Exitialis\Mas\Repository\Eloquent;
 
 use Exitialis\Mas\MasKey;
+use Exitialis\Mas\Repository\Contracts\RepositoryInterface;
 use Exitialis\Mas\User;
 
-class KeyRepository extends BaseRepository
+class KeyRepository extends BaseRepository implements RepositoryInterface
 {
     /**
-     * Получить ключи пользователя или создать новые.
-     *
-     * @param User $user
-     * @return MasKey
+     * @inheritdoc
      */
-    public function findOrCreateByUser(User $user)
+    public function model()
     {
-        if ( ! $keys =  $this->model->where('user_id', $user->getKey())->first()) {
-            $keys = new MasKey();
-            $keys->user_id = $user->getKey();
-        }
-
-        return $keys;
+        return MasKey::class;
     }
-
-    /**
-     * Сохранить/обновить ключи пользователя в базе.
-     *
-     * @param MasKey $key
-     * @param User $user
-     * @return MasKey
-     */
-    public function save(MasKey $key, User $user)
-    {
-        $login = $user->login;
-        
-        $uuid = uuidFromString($login);
-        $key->uuid = $uuid;
-        $key->user_hash = str_replace("-", "", $uuid);
-        $key->session = generateStr();
-        $key->username = $login;
-        $key->save();
-
-        return $key;
-    }
+    
 }

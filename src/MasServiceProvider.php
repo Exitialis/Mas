@@ -2,8 +2,11 @@
 
 namespace Exitialis\Mas;
 
-use Exitialis\Mas\Repositories\KeyRepository;
-use Exitialis\Mas\Repositories\UserRepository;
+use Exitialis\Mas\Managers\AuthManager;
+use Exitialis\Mas\Repository\Contracts\RepositoryInterface;
+use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
+use Exitialis\Mas\Repository\Eloquent\KeyRepository;
+use Exitialis\Mas\Repository\Eloquent\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 class MasServiceProvider extends ServiceProvider
@@ -45,12 +48,16 @@ class MasServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/mas.php', 'mas');
 
-        $this->app->singleton(UserRepository::class, function() {
-            return new UserRepository(User::class, config('mas.repositories.user'));
+        $this->app->singleton(UserRepositoryInterface::class, function($app) {
+            return new UserRepository($app, config('mas.repositories.user'));
         });
 
-        $this->app->singleton(KeyRepository::class, function() {
-            return new KeyRepository(MasKey::class);
+        $this->app->singleton(RepositoryInterface::class, function($app) {
+            return new KeyRepository($app);
+        });
+
+        $this->app->singleton(AuthManager::class, function ($app) {
+            return new AuthManager($app->make(UserRepositoryInterface::class), $app[RepositoryInterface::class]);
         });
 
     }
