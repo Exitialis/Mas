@@ -57,4 +57,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         return $this->findWhere([$this->loginColumn, $login]);
     }
+    
+    
+
 }

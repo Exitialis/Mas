@@ -18,6 +18,7 @@ interface RepositoryInterface
      * @return \Illuminate\Support\Collection|array
      */
     public function lists($column, $key = null);
+    
     /**
      * Retrieve all data of repository
      *
@@ -26,6 +27,7 @@ interface RepositoryInterface
      * @return mixed
      */
     public function all($columns = ['*']);
+    
     /**
      * Retrieve all data of repository, paginated
      *
@@ -35,6 +37,7 @@ interface RepositoryInterface
      * @return mixed
      */
     public function paginate($limit = null, $columns = ['*']);
+    
 
     /**
      * Find data by id
@@ -45,6 +48,7 @@ interface RepositoryInterface
      * @return mixed
      */
     public function find($id, $columns = ['*']);
+    
     /**
      * Find data by field and value
      *
@@ -55,6 +59,7 @@ interface RepositoryInterface
      * @return mixed
      */
     public function findByField($field, $value, $columns = ['*']);
+    
     /**
      * Find data by multiple fields
      *
@@ -64,6 +69,7 @@ interface RepositoryInterface
      * @return mixed
      */
     public function findWhere(array $where, $columns = ['*']);
+    
     /**
      * Find data by multiple values in one field
      *
@@ -74,6 +80,7 @@ interface RepositoryInterface
      * @return mixed
      */
     public function findWhereIn($field, array $values, $columns = ['*']);
+    
     /**
      * Find data by excluding multiple values in one field
      *
@@ -84,6 +91,17 @@ interface RepositoryInterface
      * @return mixed
      */
     public function findWhereNotIn($field, array $values, $columns = ['*']);
+
+    /**
+     * Найти сущности по полю.
+     *
+     * @param       $field
+     * @param       $value
+     * @param array $columns
+     * @return mixed
+     */
+    public function getByField($field, $value = null, $columns = ['*']);
+
     /**
      * Save a new entity in repository
      *
@@ -92,6 +110,7 @@ interface RepositoryInterface
      * @return mixed
      */
     public function create(array $attributes);
+
     /**
      * Update a entity in repository by id
      *
@@ -101,25 +120,24 @@ interface RepositoryInterface
      * @return mixed
      */
     public function update(array $attributes, $id);
+
     /**
      * Update or Create an entity in repository
      *
-     * @throws ValidatorException
-     *
      * @param array $attributes
      * @param array $values
-     *
      * @return mixed
      */
     public function updateOrCreate(array $attributes, array $values = []);
+
     /**
      * Delete a entity in repository by id
      *
      * @param $id
-     *
      * @return int
      */
     public function delete($id);
+
     /**
      * Order collection by a given column
      *
@@ -129,6 +147,7 @@ interface RepositoryInterface
      * @return $this
      */
     public function orderBy($column, $direction = 'asc');
+
     /**
      * Load relations
      *
@@ -137,6 +156,7 @@ interface RepositoryInterface
      * @return $this
      */
     public function with($relations);
+
     /**
      * Set hidden fields
      *
@@ -145,6 +165,7 @@ interface RepositoryInterface
      * @return $this
      */
     public function hidden(array $fields);
+
     /**
      * Set visible fields
      *
@@ -153,6 +174,7 @@ interface RepositoryInterface
      * @return $this
      */
     public function visible(array $fields);
+
     /**
      * Query Scope
      *
@@ -161,12 +183,14 @@ interface RepositoryInterface
      * @return $this
      */
     public function scopeQuery(\Closure $scope);
+
     /**
      * Reset Query Scope
      *
      * @return $this
      */
     public function resetScope();
+
     /**
      * Get Searchable Fields
      *

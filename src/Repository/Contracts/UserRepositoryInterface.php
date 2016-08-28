@@ -11,4 +11,6 @@ interface UserRepositoryInterface
      * @return mixed
      */
     public function findByLogin($login);
+
+   
 }

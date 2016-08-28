@@ -44,16 +44,7 @@ abstract class BaseRepository implements RepositoryInterface
     public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->makeModel();
-    }
-
-    /**
-     * Обновить модель.
-     *
-     * @throws RepositoryException
-     */
-    public function resetModel()
-    {
+        $this->resetScope();
         $this->makeModel();
     }
 
@@ -132,7 +123,6 @@ abstract class BaseRepository implements RepositoryInterface
             $results = $this->model->all($columns);
         }
 
-        $this->resetModel();
         $this->resetScope();
 
         return $results;
@@ -147,10 +137,7 @@ abstract class BaseRepository implements RepositoryInterface
     public function first($columns = ['*'])
     {
         $this->applyScope();
-
         $results = $this->model->first($columns);
-
-        $this->resetModel();
 
         return $results;
     }
@@ -170,7 +157,6 @@ abstract class BaseRepository implements RepositoryInterface
 
         $results = $this->model->paginate($limit, $columns);
 
-        $this->resetModel();
         return $results;
     }
 
@@ -188,7 +174,6 @@ abstract class BaseRepository implements RepositoryInterface
 
         $model = $this->model->find($id, $columns);
 
-        $this->resetModel();
         return $model;
     }
 
@@ -208,12 +193,11 @@ abstract class BaseRepository implements RepositoryInterface
 
         $model = $this->model->findOrFail($id, $columns);
 
-        $this->resetModel();
         return $model;
     }
 
     /**
-     * Найти сущности по полю.
+     * Найти сущность по полю.
      *
      * @param       $field
      * @param       $value
@@ -224,9 +208,25 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->applyScope();
 
+        $model = $this->model->where($field, $value)->first($columns);
+
+        return $model;
+    }
+
+    /**
+     * Найти сущности по полю.
+     *
+     * @param $field
+     * @param null $value
+     * @param array $columns
+     * @return mixed
+     */
+    public function getByField($field, $value = null, $columns = ['*'])
+    {
+        $this->applyScope();
+
         $model = $this->model->where($field, $value)->get($columns);
 
-        $this->resetModel();
         return $model;
     }
 
@@ -241,9 +241,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->applyScope();
         $this->applyConditions($where);
-
         $model = $this->model->first($columns);
-        $this->resetModel();
 
         return $model;
     }
@@ -260,7 +258,6 @@ abstract class BaseRepository implements RepositoryInterface
     public function findWhereIn($field, array $values, $columns = ['*'])
     {
         $model = $this->model->whereIn($field, $values)->first($columns);
-        $this->resetModel();
 
         return $model;
     }
@@ -277,7 +274,6 @@ abstract class BaseRepository implements RepositoryInterface
     public function findWhereNotIn($field, array $values, $columns = ['*'])
     {
         $model = $this->model->whereNotIn($field, $values)->first($columns);
-        $this->resetModel();
 
         return $model;
     }
@@ -293,7 +289,6 @@ abstract class BaseRepository implements RepositoryInterface
         $model = $this->model->newInstance($attributes);
         $model->save();
 
-        $this->resetModel();
 
         return $model;
     }
@@ -311,7 +306,6 @@ abstract class BaseRepository implements RepositoryInterface
 
         $model->update($attributes);
 
-        $this->resetModel();
 
         return $model;
     }
@@ -329,7 +323,6 @@ abstract class BaseRepository implements RepositoryInterface
 
         $model = $this->model->updateOrCreate($attributes, $values);
 
-        $this->resetModel();
 
         return $model;
     }
@@ -346,7 +339,6 @@ abstract class BaseRepository implements RepositoryInterface
 
         $model = $this->find($id);
 
-        $this->resetModel();
         $deleted = $model->delete();
 
         return $deleted;
@@ -361,12 +353,8 @@ abstract class BaseRepository implements RepositoryInterface
     public function deleteWhere(array $where)
     {
         $this->applyScope();
-
         $this->applyConditions($where);
-
         $deleted = $this->model->delete();
-
-        $this->resetModel();
 
         return $deleted;
     }
@@ -483,16 +471,34 @@ abstract class BaseRepository implements RepositoryInterface
      * Применить условия к модели.
      *
      * @param array $where
-     * @return void
+     * @param array $columns
+     * @param bool $or
      */
-    protected function applyConditions(array $where)
+    protected function applyConditions(array $where, $columns = ['*'], $or = false)
     {
+        $model = $this->model;
+
         foreach ($where as $field => $value) {
-            if (is_array($value)) {
-                list($field, $condition, $val) = $value;
-                $this->model = $this->model->where($field, $condition, $val);
+            if ($value instanceof \Closure) {
+                $model = (!$or)
+                    ? $model->where($value)
+                    : $model->orWhere($value);
+            } elseif (is_array($value)) {
+                if (count($value) === 3) {
+                    list($field, $operator, $search) = $value;
+                    $model = (!$or)
+                        ? $model->where($field, $operator, $search)
+                        : $model->orWhere($field, $operator, $search);
+                } elseif (count($value) === 2) {
+                    list($field, $search) = $value;
+                    $model = (!$or)
+                        ? $model->where($field, '=', $search)
+                        : $model->orWhere($field, '=', $search);
+                }
             } else {
-                $this->model = $this->model->where($field, '=', $value);
+                $model = (!$or)
+                    ? $model->where($field, '=', $value)
+                    : $model->orWhere($field, '=', $value);
             }
         }
     }

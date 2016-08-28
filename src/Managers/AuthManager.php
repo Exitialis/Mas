@@ -28,9 +28,9 @@ class AuthManager
      * AuthManager constructor.
      *
      * @param UserRepositoryInterface $users
-     * @param RepositoryInterface $keys
+     * @param KeyManager $keys
      */
-    public function __construct(UserRepositoryInterface $users, RepositoryInterface $keys)
+    public function __construct(UserRepositoryInterface $users, KeyManager $keys)
     {
         $this->users = $users;
         $this->keys = $keys;
@@ -50,7 +50,7 @@ class AuthManager
         }
 
         if ($this->checkPassword($user, $password)) {
-            return $this->keys->save($this->keys->findByField('user_id', $user->id), $user);
+            return $this->keys->updateOrCreate($user);
         }
 
         return false;
@@ -78,11 +78,9 @@ class AuthManager
             case 'dle':
                 return $realPass === md5(md5($password));
                 break;
-            default:
-                return $hasher->CheckPassword($password, $realPass);
-                break;
         }
 
         return false;
     }
+
 }

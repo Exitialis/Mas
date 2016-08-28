@@ -48,6 +48,16 @@ class User extends Model
             return $this->attributesToArray()[$password_column];
         }
 
-        parent::__get($key);
+        return parent::__get($key);
+    }
+
+    /**
+     * Ключи пользователя.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function keys()
+    {
+        return $this->hasOne(MasKey::class);
     }
 }
