@@ -27,8 +27,8 @@
           "files": ["src/helpers.php"]
       },
     "autoload-dev": {
-          "classmap": [
-            "tests/MasTestCase.php"
-          ]
+          "psr-4": {
+              "Exitialis\\Mas\\Tests\\": "tests/"
+          }
     }
 }

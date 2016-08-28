@@ -5,7 +5,7 @@ namespace Exitialis\Tests;
 use Illuminate\Foundation\Testing\TestCase;
 use Mockery\Mock;
 
-class AuthTest extends MasTestCase
+class AuthTest 
 {
     public function setUp()
     {
