@@ -2,6 +2,7 @@
 
 namespace Exitialis\Mas\Managers;
 
+use Exitialis\Mas\Managers\Hash\HashManager;
 use Exitialis\Mas\Repository\Contracts\RepositoryInterface;
 use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
 use Exitialis\Mas\User;
@@ -25,15 +26,23 @@ class AuthManager
     protected $keys;
 
     /**
+     * Шифровальщик.
+     *
+     * @var HashManager
+     */
+    protected $crypt;
+
+    /**
      * AuthManager constructor.
      *
      * @param UserRepositoryInterface $users
      * @param KeyManager $keys
      */
-    public function __construct(UserRepositoryInterface $users, KeyManager $keys)
+    public function __construct(UserRepositoryInterface $users, KeyManager $keys, HashManager $crypt)
     {
         $this->users = $users;
         $this->keys = $keys;
+        $this->crypt = $crypt;
     }
 
     /**
@@ -65,22 +74,7 @@ class AuthManager
      */
     public function checkPassword(User $user, $password)
     {
-        $hash = config('mas.hash');
-
-        $realPass = $user->password;
-
-        $hasher = new PasswordHash(8, false);
-
-         switch ($hash) {
-            case 'wp':
-                return $hasher->CheckPassword($password, $realPass);
-                break;
-            case 'dle':
-                return $realPass === md5(md5($password));
-                break;
-        }
-
-        return false;
+        return $this->crypt->checkValue($password, $user->password);
     }
 
 }

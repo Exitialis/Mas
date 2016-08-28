@@ -129,7 +129,7 @@ if ( ! function_exists('check_files')) {
      * @param $path
      * @return string
      */
-    function checkfiles($path) {
+    function check_files($path) {
         $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
         $massive = "";
         foreach($objects as $name => $object) {

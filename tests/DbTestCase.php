@@ -6,6 +6,7 @@ use Exitialis\Mas\User;
 use Illuminate\Console;
 use Exitialis\Mas\MasServiceProvider;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\TestCase as Test;

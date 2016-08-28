@@ -3,6 +3,7 @@
 namespace Exitialis\Mas;
 
 use Exitialis\Mas\Managers\AuthManager;
+use Exitialis\Mas\Managers\Hash\HashManager;
 use Exitialis\Mas\Managers\KeyManager;
 use Exitialis\Mas\Repository\Contracts\KeyRepositoryInterface;
 use Exitialis\Mas\Repository\Contracts\RepositoryInterface;
@@ -30,12 +31,12 @@ class MasServiceProvider extends ServiceProvider
         $routes = __DIR__ . "/Http/routes.php";
         $helpers = __DIR__ . "/helpers.php";
         if (file_exists($routes))
-            require_once $routes;
+            require $routes;
         else
             throw new \Exception("Mas routes not found");
 
         if (file_exists($helpers))
-            require_once $helpers;
+            require $helpers;
         else
             throw new \Exception("Mas helpers not found");
 
@@ -50,6 +51,10 @@ class MasServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/mas.php', 'mas');
 
+        $this->app->bind(HashManager::class, function() {
+            return new HashManager(config('mas.hash'));
+        });
+
         $this->app->singleton(UserRepositoryInterface::class, function($app) {
             return new UserRepository($app, config('mas.repositories.user'));
         });
@@ -63,7 +68,7 @@ class MasServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(AuthManager::class, function ($app) {
-            return new AuthManager($app[UserRepositoryInterface::class], $app[KeyManager::class]);
+            return new AuthManager($app[UserRepositoryInterface::class], $app[KeyManager::class], $app[HashManager::class]);
         });
 
     }

@@ -6,6 +6,7 @@ namespace Exitialis\Mas\Managers\Hash;
 use Exitialis\Mas\Managers\Hash\Drivers\HashContract;
 use Exitialis\Mas\Managers\Hash\Drivers\HasherContract;
 use Illuminate\Foundation\Application;
+use Mockery\CountValidator\Exception;
 
 class HashManager
 {
@@ -16,6 +17,13 @@ class HashManager
      * @var array
      */
     protected $hash;
+
+    /**
+     * Инстанс хэшера.
+     *
+     * @var HashContract
+     */
+    protected $encrypt;
 
     /**
      * HashManager constructor.
@@ -34,6 +42,12 @@ class HashManager
      */
     public function make()
     {
+        if ($this->encrypt) {
+            if ($this->encrypt instanceof HashContract) {
+                return $this->encrypt;
+            }
+        }
+
         $class = $this->getHashDriverName();
         $hash = new $class;
 
@@ -41,7 +55,7 @@ class HashManager
             throw new HashException('Class ' . $this->getHashDriverName() . ' must implement HasherContract');
         }
 
-        return $hash;
+        return $this->encrypt = $hash;
     }
 
     /**
@@ -60,5 +74,27 @@ class HashManager
         }
 
         return $class;
+    }
+
+    /**
+     * Вызов методов
+     *
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     * @throws HashException
+     */
+    public function __call($name, $arguments)
+    {
+        switch ($name) {
+            case 'hash':
+                return $this->make()->{$name}($arguments[0]);
+                break;
+            case 'checkValue':
+                return $this->make()->{$name}($arguments[0], $arguments[1]);
+                break;
+        }
+
+        throw new HashException('Method ' . $name . ' not found in hash class');
     }
 }
