@@ -10,15 +10,7 @@ use Illuminate\Routing\ResponseFactory;
 
 class MasTexturesController extends Controller
 {
-    protected $request;
-    protected $response;
-
-    public function __construct(Request $request, ResponseFactory $response)
-    {
-        $this->request = $request;
-        $this->response = $response;
-    }
-
+    
     public function getSkin($username)
     {
         $uploaddirs = config("mas.path.uploaddirs");

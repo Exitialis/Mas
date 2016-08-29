@@ -1,9 +1,11 @@
 <?php namespace Exitialis\Mas\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Exitialis\Mas\Managers\TexturesManager;
 use Exitialis\Mas\MasKey;
 use Exitialis\Mas\Repository\Contracts\KeyRepositoryInterface;
 use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
+use Faker\Provider\zh_TW\Text;
 use GuzzleHttp\Client;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
@@ -58,13 +60,13 @@ class MasClientController extends Controller
             return response()->json(['error' => 'user not found']);
         }
 
-        $user->serverid = $this->request->serverId;
+        $user->serverid = $serverId;
         $user->save();
 
         return response('', '204');
     }
 
-    public function hasJoined()
+    public function hasJoined(Request $request)
     {
         $this->validate($request, [
             'username' => 'required|regex:/^[a-zA-Z0-9_-]+$/',
@@ -76,18 +78,17 @@ class MasClientController extends Controller
 
         $error = ["error" => "Bad login", "errorMessage" => "Bad Login"];
 
-        if ( ! $user = $this->keys->findWhere(["username", $username, "serverid", $serverId])->first()) {
+        if ( ! $user = $this->keys->findWhere(["username", $username, "serverid", $serverId])->first()->user) {
             return response()->json(compact('error'));
         };
 
-        $request = route()->create(config("mas.route_prefix") . "/textures/" . $realUser);
+        $manager = new TexturesManager(config('mas.path'));
 
-        $time = time();
         $base64 ='
 			{
-				"timestamp":"'.$time.'","profileId":"'.$user->user_hash.'","profileName":"'.$realUser.'","textures":
+				"timestamp":"'.time().'","profileId":"'.$user->user_hash.'","profileName":"'.$realUser.'","textures":
 				{
-				    ' . $textures . '
+				    ' . $manager->getTextures($user). '
 				}
 			}';
         return '
@@ -101,28 +102,28 @@ class MasClientController extends Controller
 			}';
     }
 
-    public function profile($user_hash)
+    public function profile(Request $request)
     {
-        $error = array("error" => "Bad login", "errorMessage" => "Bad Login");
-        if (!preg_match("/^[a-zA-Z0-9_-]+$/", $user_hash)){
-            return response()->json($error);
-        }
-        $user = $this->masKeys->where("user_hash", "=", $user_hash)->first();
-        if ($user == null)
-            return response()->json($error);
-        $realUser = $user->username;
-        $time = time();
-        $textures = $this->request->create(config("mas.route_prefix" . "/textures/" . $realUser));
+        $this->validate($request, [
+            'user_hash' => 'required'
+        ]);
+
+        $key = $this->keys->findWhere('user_hash', $request->input('user_hash'));
+
+        $realUser = $key->username;
+        
+        $manager = new TexturesManager(config('mas.textures'));
+        
         $base64 ='
 		{
-			"timestamp":"'.$time.'","profileId":"'.$user->user_hash.'","profileName":"'.$realUser.'","textures":
+			"timestamp":"'.time().'","profileId":"'.$key->user_hash.'","profileName":"'.$realUser.'","textures":
 			{
-				'. $textures .'
+				'. $manager->getTextures($key->user) .'
 			}
 		}';
         return '
 		{
-			"id":"'.$user->user_hash.'","name":"'.$realUser.'","properties":
+			"id":"'.$key->user_hash.'","name":"'.$realUser.'","properties":
 			[
 			{
 				"name":"textures","value":"'.base64_encode($base64).'"
@@ -131,10 +132,12 @@ class MasClientController extends Controller
 		}';
     }
 
-    public function server(Filesystem $file)
+    public function server(Request $request, Filesystem $file)
     {
-        $client = $this->request->input("client");
-        if (!file_exists(config("mas.path.clients") . "/$client"))
+        $client = $request->input("client");
+        $clients = config("mas.path.clients");
+
+        if ( ! file_exists(config("mas.path.clients") . "/$client"))
             return "Client not found";
         $file_path = config("mas.path.clients") . "/hash/" . $client;
         if (file_exists($file_path))
@@ -144,7 +147,7 @@ class MasClientController extends Controller
         }
         else
         {
-            $hash = $this->generator->hashc($client);
+            $hash = hashc($client);
             $file->put($file_path, $hash);
             return $hash;
         }

@@ -23,15 +23,16 @@ return [
         ],
     ],
 
-    'path' => [
-        'uploaddirs' => "skins/skin",
-        'uploaddirc' => "skins/cape",
-        'clients' =>  "clients"
+    'textures' => [
+        'path' => [
+            'skin_path' => 'textures/skin',
+            'cloak_path' => 'textures/cloak'
+        ],
+        'skin_default' => 'default'
     ],
 
-    'url' => [
-        'skin' => "lk/skins/skin",
-        'cape' => "lk/skins/cape"
-    ]
+    'path' => [
+        'clients' =>  "clients"
+    ],
 
 ];
