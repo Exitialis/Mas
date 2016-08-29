@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Controller;
 use Exitialis\Mas\MasKey;
+use Exitialis\Mas\Repository\Contracts\KeyRepositoryInterface;
+use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
 use GuzzleHttp\Client;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
@@ -10,6 +12,31 @@ use Illuminate\Support\Facades\Route;
 class MasClientController extends Controller
 {
     /**
+     * Репозиторий пользователей.
+     *
+     * @var UserRepositoryInterface
+     */
+    protected $users;
+
+    /**
+     * Репозиторий ключей.
+     *
+     * @var KeyRepositoryInterface
+     */
+    protected $keys;
+
+    /**
+     * MasClientController constructor.
+     * @param $users
+     * @param $keys
+     */
+    public function __construct(UserRepositoryInterface $users, KeyRepositoryInterface $keys)
+    {
+        $this->users = $users;
+        $this->keys = $keys;
+    }
+    
+    /**
      * Обработать эвент входа на сервер.
      *
      * @param Request $request
@@ -17,20 +44,19 @@ class MasClientController extends Controller
      */
     public function join(Request $request)
     {
-        $error = array("error" => "Bad login", "errorMessage" => "Bad Login");
+        $this->validate($request, [
+            'selectedProfile' => 'required|regex:/^[a-zA-Z0-9_-]+$/',
+            'accessToken' => 'required|regex:/^[a-zA-Z0-9:_-]+$/',
+            'serverId' => 'required|regex:/^[a-zA-Z0-9_-]+$/',
+        ]);
 
         $session = $request->input("accessToken");
-        $selectedProfile = $request->input("selectedProfile");
+        $uuid = $request->input("selectedProfile");
         $serverId = $request->input("serverId");
 
-        if (!preg_match("/^[a-zA-Z0-9_-]+$/", $selectedProfile) || !preg_match("/^[a-zA-Z0-9:_-]+$/", $session) || !preg_match("/^[a-zA-Z0-9_-]+$/", $serverId)){
-            return response()->json($error);
+        if ( ! $user = $this->keys->findWhere(['uuid' => $uuid, 'session' => $session])) {
+            return response()->json(['error' => 'user not found']);
         }
-
-        $user = MasKey::byUserHash($session);
-
-        if ($user == null)
-            return response()->json($error);
 
         $user->serverid = $this->request->serverId;
         $user->save();
@@ -40,18 +66,22 @@ class MasClientController extends Controller
 
     public function hasJoined()
     {
+        $this->validate($request, [
+            'username' => 'required|regex:/^[a-zA-Z0-9_-]+$/',
+            'serverId' => 'required|regex:/^[a-zA-Z0-9_-]+$/',
+        ]);
+
         $username = $this->request->input("username");
         $serverId = $this->request->input("serverId");
-        $error = array("error" => "Bad login", "errorMessage" => "Bad Login");
-        if (!preg_match("/^[a-zA-Z0-9_-]+$/", $username) || !preg_match("/^[a-zA-Z0-9_-]+$/", $serverId)){
-            return response()->json($error);
-        }
-        $user = $this->masKeys->where("username", "=", $username)->where("serverid", "=", $serverId)->first();
-        if ($user == null)
-            return response()->json(["error" => "Bad login", "errorMessage" => "User not found"]);
-        $realUser = $user->username;
-        $request = $this->request->create(config("mas.route_prefix") . "/textures/" . $realUser);
-        $textures = Route::dispatch($request)->getContent();
+
+        $error = ["error" => "Bad login", "errorMessage" => "Bad Login"];
+
+        if ( ! $user = $this->keys->findWhere(["username", $username, "serverid", $serverId])->first()) {
+            return response()->json(compact('error'));
+        };
+
+        $request = route()->create(config("mas.route_prefix") . "/textures/" . $realUser);
+
         $time = time();
         $base64 ='
 			{

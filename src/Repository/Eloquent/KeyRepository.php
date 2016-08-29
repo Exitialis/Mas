@@ -34,7 +34,7 @@ class KeyRepository extends BaseRepository implements KeyRepositoryInterface
      * @param $uuid
      * @return mixed
      */
-    public function findUserByUuid($uuid)
+    public function findByUuid($uuid)
     {
         return $this->findByField(compact('uuid'));
     }
