@@ -55,7 +55,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
      */
     public function findByLogin($login)
     {
-        return $this->findWhere([$this->loginColumn, $login]);
+        return $this->findWhere([$this->loginColumn => $login]);
     }
     
     
