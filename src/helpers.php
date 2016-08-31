@@ -147,14 +147,14 @@ if ( ! function_exists('check_files')) {
 if ( ! function_exists('hashc')) {
 
     /**
-     * 
+     * Составить hash версии клиента для проверки лаунчером.
      *
      * @param $client
      * @return string
      */
     function hashc($client) {
         $client_path = config("mas.path.clients");
-        $hash_md5 = str_replace("\\", "/",$this->checkfiles($client_path . '/' .$client.'/bin/').$this->checkfiles($client_path . '/'.$client.'/mods/').$this->checkfiles($client_path . '/' .$client.'/coremods/').$this->checkfiles($client_path . '/' .$client.'/natives/')).'<::>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
+        $hash_md5 = str_replace("\\", "/",check_files($client_path . '/' .$client.'/bin/').check_files($client_path . '/'.$client.'/mods/').check_files($client_path . '/' .$client.'/coremods/').check_files($client_path . '/' .$client.'/natives/')).'<::>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
         return $hash_md5;
     }
 }

@@ -73,12 +73,12 @@ class MasClientController extends Controller
             'serverId' => 'required|regex:/^[a-zA-Z0-9_-]+$/',
         ]);
 
-        $username = $this->request->input("username");
-        $serverId = $this->request->input("serverId");
+        $username = $request->input("username");
+        $serverId = $request->input("serverId");
 
         $error = ["error" => "Bad login", "errorMessage" => "Bad Login"];
 
-        if ( ! $user = $this->keys->findWhere(["username", $username, "serverid", $serverId])->first()->user) {
+        if ( ! $user = $this->keys->findWhere(["username" => $username, "serverid" => $serverId])->first()->user) {
             return response()->json(compact('error'));
         };
 
@@ -102,13 +102,9 @@ class MasClientController extends Controller
 			}';
     }
 
-    public function profile(Request $request)
+    public function profile(Request $request, $user)
     {
-        $this->validate($request, [
-            'user_hash' => 'required'
-        ]);
-
-        $key = $this->keys->findWhere('user_hash', $request->input('user_hash'));
+        $key = $this->keys->findWhere('user_hash', $user);
 
         $realUser = $key->username;
         
