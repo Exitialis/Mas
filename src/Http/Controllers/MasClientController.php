@@ -55,11 +55,11 @@ class MasClientController extends Controller
         ]);
 
         $session = $request->input("accessToken");
-        $uuid = $request->input("selectedProfile");
+        $user_hash = $request->input("selectedProfile");
         $serverId = $request->input("serverId");
 
-        if ( ! $key = $this->keys->findWhere(['uuid' => $uuid, 'session' => $session])) {
-            return response()->json(['error' => 'Bad login', 'errorMessage' => 'Bad Login']);
+        if ( ! $key = $this->keys->where(['user_hash' => $user_hash])->findWhere(['session' => $session])) {
+            return response()->json(["error" => "Bad login", "errorMessage" => "Bad Login"]);
         }
 
         $key->serverid = $serverId;
