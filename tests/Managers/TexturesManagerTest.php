@@ -29,7 +29,7 @@ class TexturesManagerTest extends DbTestCase
      */
     public function testGettingSkinUrl()
     {
-        $rightPath = asset(config('mas.textures.path.skin_path') . '/' . $this->user->login . '.png');
+        $rightPath = asset(config('mas.textures.path.skin') . '/' . $this->user->login . '.png');
         $skin = $this->manager->getSkin($this->user);
         
         $this->assertEquals($skin, $rightPath);
@@ -37,7 +37,7 @@ class TexturesManagerTest extends DbTestCase
     
     public function testGettingDefaultSkinUrl()
     {
-        $rightPath = asset(config('mas.textures.path.skin_path') . '/' . config('mas.textures.skin_default') . '.png');
+        $rightPath = asset(config('mas.textures.path.skin') . '/' . config('mas.textures.skin_default') . '.png');
         $skin = $this->manager->getSkin($this->user);
 
         $this->assertEquals($skin, $rightPath);
@@ -48,9 +48,14 @@ class TexturesManagerTest extends DbTestCase
      */
     public function testGettingCapeUrl()
     {
-        $rightPath = asset(config('mas.textures.path.cloak_path') . '/' . $this->user->login . '.png');
-        $skin = $this->manager->getCape($this->user);
+        $rightPath = asset(config('mas.textures.path.cloak') . '/' . $this->user->login . '.png');
+        $skin = $this->manager->getCloak($this->user);
 
         $this->assertEquals($skin, $rightPath);
+    }
+
+    protected function publishAsset($path)
+    {
+        
     }
 }

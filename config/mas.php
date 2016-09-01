@@ -25,8 +25,8 @@ return [
 
     'textures' => [
         'path' => [
-            'skin_path' => 'textures/skin',
-            'cloak_path' => 'textures/cloak'
+            'skin' => 'textures/skin',
+            'cloak' => 'textures/cloak'
         ],
         'skin_default' => 'default'
     ],

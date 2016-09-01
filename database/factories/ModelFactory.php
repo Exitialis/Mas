@@ -9,20 +9,23 @@ $factory->define(Exitialis\Mas\User::class, function (Faker\Generator $faker) {
     $crypt = new HashManager(config('mas.hash'));
 
     return [
-        $config['login_column'] => $faker->name,
+        $config['login_column'] => $faker->userName,
         $config['password_column'] => $crypt->hash('12345'),
     ];
 });
 
 $factory->define(Exitialis\Mas\MasKey::class, function (Faker\Generator $faker) {
 
-    $username = $faker->name;
-    $uuid = uuidFromString($username);
-
     return [
-        'username' => $username,
-        'uuid' => $uuid,
+        'username' => function(array $key) {
+            return Exitialis\Mas\User::find($key['user_id'])->login;
+        },
+        'uuid' => function(array $key) {
+            return uuidFromString($key['username']);
+        },
         'session' => generateStr(),
-        'user_hash' => str_replace('-', '', $uuid)
+        'user_hash' => function(array $key) {
+            return str_replace('-', '', $key['uuid']);
+        }
     ];
 });

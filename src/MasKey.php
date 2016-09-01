@@ -20,7 +20,7 @@ class MasKey extends Model
      */
     public function user()
     {
-        return $this->belongsTo(config('mas.users.model'));
+        return $this->belongsTo(User::class);
     }
 
     /**

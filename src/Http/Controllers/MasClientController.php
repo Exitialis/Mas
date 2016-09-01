@@ -78,11 +78,15 @@ class MasClientController extends Controller
 
         $error = ["error" => "Bad login", "errorMessage" => "Bad Login"];
 
-        if ( ! $user = $this->keys->findWhere(["username" => $username, "serverid" => $serverId])->first()->user) {
-            return response()->json(compact('error'));
+        if ( ! $key = $this->keys->findWhere(["username" => $username])) {
+            return response()->json($error);
         };
 
-        $manager = new TexturesManager(config('mas.path'));
+        $user = $key->user;
+
+        $realUser = $user->login;
+
+        $manager = new TexturesManager(config('mas.textures'));
 
         $base64 ='
 			{
@@ -104,7 +108,7 @@ class MasClientController extends Controller
 
     public function profile(Request $request, $user)
     {
-        $key = $this->keys->findWhere('user_hash', $user);
+        $key = $this->keys->findWhere(['user_hash' => $user]);
 
         $realUser = $key->username;
         

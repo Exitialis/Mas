@@ -34,8 +34,8 @@ class TexturesManager
      */
     public function __construct(array $config)
     {
-        $this->skinPath = $config['path']['skin_path'];
-        $this->capePath = $config['path']['cloak_path'];
+        $this->skinPath = $config['path']['skin'];
+        $this->capePath = $config['path']['cloak'];
         $this->skinDefault = $config['skin_default'];
     }
 
