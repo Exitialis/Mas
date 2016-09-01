@@ -78,7 +78,7 @@ class MasClientController extends Controller
 
         $error = ["error" => "Bad login", "errorMessage" => "Bad Login"];
 
-        if ( ! $key = $this->keys->findWhere(["username" => $username])) {
+        if ( ! $key = $this->keys->where(["username" => $username])->findWhere(['serverId' => $serverId])) {
             return response()->json($error);
         };
 

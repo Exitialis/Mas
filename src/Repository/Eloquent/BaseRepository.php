@@ -231,6 +231,19 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+     * Установить условие.
+     * 
+     * @param  array  $where 
+     * @return mixed      
+     */
+    public function where(array $where)
+    {
+        $this->applyConditions($where);
+
+        return $this;
+    }
+
+    /**
      * Найти данные по нескольким полям.
      *
      * @param array $where
