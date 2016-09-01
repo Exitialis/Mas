@@ -110,6 +110,10 @@ class MasClientController extends Controller
     {
         $key = $this->keys->findWhere(['user_hash' => $user]);
 
+        if ( ! $key) {
+            return response()->json(["error" => "Bad login", "errorMessage" => "Bad Login"]);
+        }
+
         $realUser = $key->username;
         
         $manager = new TexturesManager(config('mas.textures'));
