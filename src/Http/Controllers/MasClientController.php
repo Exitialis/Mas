@@ -90,14 +90,14 @@ class MasClientController extends Controller
 
         $base64 ='
 			{
-				"timestamp":"'.time().'","profileId":"'.$user->user_hash.'","profileName":"'.$realUser.'","textures":
+				"timestamp":"'.time().'","profileId":"'.$key->uuid.'","profileName":"'.$realUser.'","textures":
 				{
 				    ' . $manager->getTextures($user). '
 				}
 			}';
         return '
 			{
-				"id":"'.$user->user_hash.'","name":"'.$realUser.'","properties":
+				"id":"'.$key->uuid.'","name":"'.$realUser.'","properties":
 				[
 				{
 					"name":"textures","value":"'.base64_encode($base64).'","signature":"Cg=="
