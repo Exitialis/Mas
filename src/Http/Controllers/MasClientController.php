@@ -9,7 +9,9 @@ use Faker\Provider\zh_TW\Text;
 use GuzzleHttp\Client;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Monolog\Logger;
 
 class MasClientController extends Controller
 {
@@ -56,12 +58,12 @@ class MasClientController extends Controller
         $uuid = $request->input("selectedProfile");
         $serverId = $request->input("serverId");
 
-        if ( ! $user = $this->keys->findWhere(['uuid' => $uuid, 'session' => $session])) {
-            return response()->json(['error' => 'user not found']);
+        if ( ! $key = $this->keys->findWhere(['uuid' => $uuid, 'session' => $session])) {
+            return response()->json(['error' => 'Bad login', 'errorMessage' => 'Bad Login']);
         }
 
-        $user->serverid = $serverId;
-        $user->save();
+        $key->serverid = $serverId;
+        $key->save();
 
         return response('', '204');
     }
@@ -126,7 +128,7 @@ class MasClientController extends Controller
             'timestamp' => time(),
             'profileId' => $key->uuid,
             'profileName' => $realUser,
-            'textures' => $manager->getTextures($user),
+            'textures' => $manager->getTextures($key->user),
         ]);
 
         $output = [
