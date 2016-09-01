@@ -87,27 +87,16 @@ class TexturesManager
      */
     public function getTextures(User $user)
     {
-        $skin = '
-              "SKIN":
-					{
-						"url":"'.$this->getSkin($user).'"
-					}
-        ';
-        $cloak = '';
+        $skin = ['SKIN' => ['url' => $this->getSkin($user)]];
+        $cloak = null;
         if ($cloakUrl = $this->getCloak($user)) {
-            $cloak = '
-                "CAPE":
-                    {
-                        "url":"'.$cloakUrl.'"
-                    }
-            ';
+            $cloak = ['CAPE' => ['url' => $cloakUrl]];
         }
         
-        $separator = $cloak === '' ?: ',';
-
-        return '
-              ' . $skin . $separator .'
-              ' . $cloak . '
-        ';
+        if ($cloak) {
+            $skin = array_merge($skin, $cloak);
+        }
+        
+        return $skin;
     }
 }

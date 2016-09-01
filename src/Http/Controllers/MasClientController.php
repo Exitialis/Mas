@@ -88,22 +88,26 @@ class MasClientController extends Controller
 
         $manager = new TexturesManager(config('mas.textures'));
 
-        $base64 ='
-			{
-				"timestamp":"'.time().'","profileId":"'.$key->uuid.'","profileName":"'.$realUser.'","textures":
-				{
-				    ' . $manager->getTextures($user). '
-				}
-			}';
-        return '
-			{
-				"id":"'.$key->uuid.'","name":"'.$realUser.'","properties":
-				[
-				{
-					"name":"textures","value":"'.base64_encode($base64).'","signature":"Cg=="
-				}
-				]
-			}';
+        $base64 = json_encode([
+            'timestamp' => time(),
+            'profileId' => $key->uuid,
+            'profileName' => $realUser,
+            'textures' => $manager->getTextures($user),
+        ]);
+
+        $output = [
+            'id' => $key->uuid,
+            'name' => $realUser,
+            'properties' => array(
+                [
+                    'name' => 'textures',
+                    'value' => base64_encode($base64),
+                    'signature' => 'Cg==',
+                ]
+            )
+        ];
+    
+        return json_encode($output);
     }
 
     public function profile(Request $request, $user)
@@ -118,22 +122,25 @@ class MasClientController extends Controller
         
         $manager = new TexturesManager(config('mas.textures'));
         
-        $base64 ='
-		{
-			"timestamp":"'.time().'","profileId":"'.$key->uuid.'","profileName":"'.$realUser.'","textures":
-			{
-				'. $manager->getTextures($key->user) .'
-			}
-		}';
-        return '
-		{
-			"id":"'.$key->uuid.'","name":"'.$realUser.'","properties":
-			[
-			{
-				"name":"textures","value":"'.base64_encode($base64).'"
-			}
-			]
-		}';
+        $base64 = json_encode([
+            'timestamp' => time(),
+            'profileId' => $key->uuid,
+            'profileName' => $realUser,
+            'textures' => $manager->getTextures($user),
+        ]);
+
+        $output = [
+            'id' => $key->uuid,
+            'name' => $realUser,
+            'properties' => array(
+                [
+                    'name' => 'textures',
+                    'value' => base64_encode($base64),
+                ]
+            )
+        ];
+
+        return json_encode($output);
     }
 
     public function server(Request $request, Filesystem $file)
