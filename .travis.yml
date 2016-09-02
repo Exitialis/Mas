@@ -1,5 +1,4 @@
 language: php
-
 sudo: true
 
 php:
@@ -8,17 +7,12 @@ php:
   - 7.0
   - hhvm
 
- notifications:
-   slack: exteamc:5mDwsT0TToX71OLtnFgtpPyO
-   email: never
-
-sudo: false
+notifications:
+ slack: exteamc:5mDwsT0TToX71OLtnFgtpPyO
+ email: never
 
 matrix:
   fast_finish: true
-
-  allow_failures:
-    - php: hhvm
 
 cache:
   directories:
@@ -29,7 +23,7 @@ services: mysql
 install:
   # create a new database for the hyn connection
   - export DB_CONNECTION=sqlite QUEUE_DRIVER=sync APP_ENV=testing CACHE_DRIVER=array SESSION_DRIVER=array
-  
+
 script:
   #script to setup the package for testing
   - cd laravel
