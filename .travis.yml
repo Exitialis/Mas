@@ -18,5 +18,4 @@ install:
 script:
   #script to setup the package for testing
   - composer update
-  - php artisan vendor:publish --force
   - phpunit
