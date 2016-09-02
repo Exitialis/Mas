@@ -16,16 +16,15 @@ $factory->define(Exitialis\Mas\User::class, function (Faker\Generator $faker) {
 
 $factory->define(Exitialis\Mas\MasKey::class, function (Faker\Generator $faker) {
 
+    $user = factory(Exitialis\Mas\User::class)->create();
+    $userName = $user->login;
+    $uuid = uuidFromString($userName);
+
     return [
-        'username' => function(array $key) {
-            return Exitialis\Mas\User::find($key['user_id'])->login;
-        },
-        'uuid' => function(array $key) {
-            return uuidFromString($key['username']);
-        },
+        'user_id' => $user->getKey(),
+        'username' => $userName,
+        'uuid' => $uuid,
         'session' => generateStr(),
-        'user_hash' => function(array $key) {
-            return str_replace('-', '', $key['uuid']);
-        }
+        'user_hash' => str_replace('-', '', $uuid),
     ];
 });

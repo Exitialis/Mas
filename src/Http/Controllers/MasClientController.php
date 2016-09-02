@@ -5,6 +5,7 @@ use Exitialis\Mas\Managers\TexturesManager;
 use Exitialis\Mas\MasKey;
 use Exitialis\Mas\Repository\Contracts\KeyRepositoryInterface;
 use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
+use Exitialis\Mas\Repository\Eloquent\KeyRepository;
 use Faker\Provider\zh_TW\Text;
 use GuzzleHttp\Client;
 use Illuminate\Filesystem\Filesystem;
@@ -90,12 +91,7 @@ class MasClientController extends Controller
 
         $manager = new TexturesManager(config('mas.textures'));
 
-        $base64 = json_encode([
-            'timestamp' => time(),
-            'profileId' => $key->uuid,
-            'profileName' => $realUser,
-            'textures' => $manager->getTextures($user),
-        ]);
+        $textures = $manager->getTextures($user, $key);
 
         $output = [
             'id' => $key->uuid,
@@ -103,7 +99,7 @@ class MasClientController extends Controller
             'properties' => array(
                 [
                     'name' => 'textures',
-                    'value' => base64_encode($base64),
+                    'value' => base64_encode($textures),
                     'signature' => 'Cg==',
                 ]
             )

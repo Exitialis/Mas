@@ -4,6 +4,7 @@ use Exitialis\Mas\Managers\TexturesManager;
 use Exitialis\Mas\Tests\DbTestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 class TexturesManagerTest extends DbTestCase
 {
@@ -29,9 +30,15 @@ class TexturesManagerTest extends DbTestCase
      */
     public function testGettingSkinUrl()
     {
+        $this->creatingDirs();
+        $path = public_path('textures/skin/' . $this->user->login . '.png');
+
+        copy(__DIR__ . '/../test.png', $path);
+
         $rightPath = asset(config('mas.textures.path.skin') . '/' . $this->user->login . '.png');
         $skin = $this->manager->getSkin($this->user);
-        
+        //unlink($path);
+
         $this->assertEquals($skin, $rightPath);
     }
     
@@ -46,16 +53,30 @@ class TexturesManagerTest extends DbTestCase
     /**
      * Тест получения ссылки на плащ пользователя.
      */
-    public function testGettingCapeUrl()
+    public function testGettingCloakUrl()
     {
+        $this->creatingDirs();
+        $path = public_path('textures/cloak/' . $this->user->login . '.png');
+
+        copy(__DIR__ . '/../test.png', $path);
         $rightPath = asset(config('mas.textures.path.cloak') . '/' . $this->user->login . '.png');
         $skin = $this->manager->getCloak($this->user);
+        unlink($path);
 
         $this->assertEquals($skin, $rightPath);
     }
 
-    protected function publishAsset($path)
+    /**
+     * Создать необходимые директории.
+     */
+    protected function creatingDirs()
     {
-        
+        $path = public_path();
+        if ( ! file_exists(public_path('textures/skin'))) {
+            mkdir($path . '/textures');
+            mkdir($path . '/textures/skin');
+            mkdir($path . '/textures/cloak');
+        }
     }
+
 }

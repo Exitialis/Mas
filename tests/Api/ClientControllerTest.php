@@ -14,8 +14,13 @@ class ClientControllerTest extends DbTestCase
      *
      * @var MasKey
      */
-    protected $keys;
+    protected $key;
 
+    /**
+     * Рандомная строка serverId.
+     * 
+     * @var string
+     */
     protected $serverId;
 
     /**
@@ -25,9 +30,10 @@ class ClientControllerTest extends DbTestCase
     {
         parent::setUp();
 
-        $this->keys = factory(MasKey::class)->create([
-            'user_id' => $this->user->getKey()
-        ]);
+        $key = factory(MasKey::class)->create();
+
+        $this->user = $key->user;
+        $this->key = $key;
 
         $this->serverId = str_random(32);
     }
@@ -37,11 +43,11 @@ class ClientControllerTest extends DbTestCase
      */
     public function testJoinEndpoint()
     {
-        $uuid = $this->user->keys->uuid;
-        $accessToken = $this->user->keys->session;
+        $user_hash = $this->key->user_hash;
+        $accessToken = $this->key->session;
 
         $this->post(route('mas.join'), [
-            'selectedProfile' => $uuid,
+            'selectedProfile' => $user_hash,
             'accessToken' => $accessToken,
             'serverId' => $this->serverId,
         ])->seeStatusCode(204)->seeInDatabase('mas_keys', [
@@ -53,20 +59,26 @@ class ClientControllerTest extends DbTestCase
     public function testHasJoinedEndpoint()
     {
         $manager = new TexturesManager(config('mas.textures'));
-        
-        $this->get(route('mas.hasJoined', [
-            'username' => $this->user->login,
+        $textures = $manager->getTextures($this->user, $this->key);
+
+        $this->key->serverid = $this->serverId;
+        $this->key->save();
+
+        $reponse = $this->get(route('mas.hasJoined', [
+            'username' => $this->key->username,
             'serverId' => $this->serverId,
         ]),[
             'Accept' => 'application/json'
         ])->seeStatusCode(200)->dontSeeJson(["error" => "Bad login", "errorMessage" => "Bad Login"])->seeJson([
-            'id' => $this->user->keys->user_hash,
-            'name' => $this->user->login,
-            'properties' => [
+            'id' => $this->key->uuid,
+            'name' => $this->key->username,
+            'properties' => array(
+                [
                 'name' => 'textures',
-                'value' => base64_encode($manager->getTextures($this->user)),
+                'value' => base64_encode($textures),
                 'signature' => 'Cg=='
-            ],
+                ]
+            ),
         ]);
     }
     

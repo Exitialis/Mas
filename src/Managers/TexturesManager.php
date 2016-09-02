@@ -3,6 +3,7 @@
 namespace Exitialis\Mas\Managers;
 
 //TODO: реализовать выдачу из папки cache
+use Exitialis\Mas\MasKey;
 use Exitialis\Mas\User;
 
 class TexturesManager
@@ -53,7 +54,7 @@ class TexturesManager
 
         // Если не найден скин у пользователя, то подставляем
         // стандартный скин сервера из конфигов.
-        if ( ! file_exists($path)) {
+        if ( ! file_exists(public_path($path))) {
             return asset($basePath . $this->skinDefault . $format);
         }
 
@@ -73,7 +74,7 @@ class TexturesManager
         $path = $basePath . $user->login . $format;
 
         // Если не найден плащ у пользователя, то возвращаем false.
-        if ( ! file_exists($path)) {
+        if ( ! file_exists(public_path($path))) {
             return false;
         }
 
@@ -84,8 +85,9 @@ class TexturesManager
      * Получить текстуры пользователя.
      *
      * @param User $user
+     * @return string
      */
-    public function getTextures(User $user)
+    public function getTextures(User $user, MasKey $key)
     {
         $skin = ['SKIN' => ['url' => $this->getSkin($user)]];
         $cloak = null;
@@ -97,6 +99,11 @@ class TexturesManager
             $skin = array_merge($skin, $cloak);
         }
         
-        return $skin;
+        return json_encode([
+            'timestamp' => time(),
+            'profileId' => $key->uuid,
+            'profileName' => $key->username,
+            'textures' => $skin
+        ]);
     }
 }
