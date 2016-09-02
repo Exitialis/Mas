@@ -9,7 +9,7 @@ $factory->define(Exitialis\Mas\User::class, function (Faker\Generator $faker) {
     $crypt = new HashManager(config('mas.hash'));
 
     return [
-        $config['login_column'] => $faker->userName,
+        $config['login_column'] => str_replace('.', '', $faker->userName),
         $config['password_column'] => $crypt->hash('12345'),
     ];
 });
