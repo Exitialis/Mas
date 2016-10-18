@@ -58,7 +58,11 @@ class TexturesManager
             return asset($basePath . $this->skinDefault . $format);
         }
 
-        return asset($path);
+        $cache_path = public_path('cache/') . md5($user->login . 'skin') . $format;
+
+        copy($path, $cache_path);
+
+        return asset($cache_path);
     }
 
     /**
@@ -78,7 +82,11 @@ class TexturesManager
             return false;
         }
 
-        return asset($path);
+        $cache_path = public_path('cache/') . md5($user->login . 'cloak') . $format;
+
+        copy($path, $cache_path);
+
+        return asset($cache_path);
     }
 
     /**

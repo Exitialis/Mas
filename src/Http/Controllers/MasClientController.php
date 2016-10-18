@@ -124,7 +124,7 @@ class MasClientController extends Controller
             'timestamp' => time(),
             'profileId' => $key->uuid,
             'profileName' => $realUser,
-            'textures' => $manager->getTextures($key->user),
+            'textures' => $manager->getTextures($key->user, $key),
         ]);
 
         $output = [
