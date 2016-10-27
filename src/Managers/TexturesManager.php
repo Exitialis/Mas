@@ -30,6 +30,13 @@ class TexturesManager
     protected $skinDefault;
 
     /**
+     * Путь до стандартного плаща.
+     * 
+     * @var mixed
+     */
+    protected $cloakDefaul;
+
+    /**
      * TexturesManager constructor.
      * @param array $config
      */
@@ -38,6 +45,7 @@ class TexturesManager
         $this->skinPath = $config['path']['skin'];
         $this->capePath = $config['path']['cloak'];
         $this->skinDefault = $config['skin_default'];
+        $this->cloakDefault = $config['cloak_default'];
     }
 
     /**
@@ -62,7 +70,7 @@ class TexturesManager
 
         copy($path, $cache_path);
 
-        return asset($cache_path);
+        return asset('cache/' . md5($user->login . 'skin') . $format);
     }
 
     /**
@@ -79,14 +87,14 @@ class TexturesManager
 
         // Если не найден плащ у пользователя, то возвращаем false.
         if ( ! file_exists(public_path($path))) {
-            return false;
+            return asset($basePath . $this->cloakDefault . $format);
         }
 
         $cache_path = public_path('cache/') . md5($user->login . 'cloak') . $format;
 
         copy($path, $cache_path);
 
-        return asset($cache_path);
+        return asset('cache/' . md5($user->login . 'cloak') . $format);
     }
 
     /**

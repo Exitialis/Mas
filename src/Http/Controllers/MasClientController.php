@@ -120,12 +120,7 @@ class MasClientController extends Controller
         
         $manager = new TexturesManager(config('mas.textures'));
         
-        $base64 = json_encode([
-            'timestamp' => time(),
-            'profileId' => $key->uuid,
-            'profileName' => $realUser,
-            'textures' => $manager->getTextures($key->user, $key),
-        ]);
+        $base64 = $manager->getTextures($key->user, $key);
 
         $output = [
             'id' => $key->uuid,
