@@ -10,6 +10,7 @@ Minecraft auth service
 
 :package_description
 
+- [Required](#required)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
@@ -17,6 +18,11 @@ Minecraft auth service
 - [Credits](#credits)
 - [License](#license)
 
+Required
+--------
+
+a)Install Laravel
+b)Configure connection to MySQL in Laravel
 
 Installation
 ------------
@@ -35,6 +41,19 @@ Or via the command line in the root of your Laravel installation.
 
 ``` bash
 $ composer require "exitialis/mas"
+```
+
+Add to your `config/app.php` file in Laravel. 
+
+``` json
+'providers' => [
+        .....
+         /*
+         * Package Service Providers...
+         */
+		Exitialis\Mas\MasServiceProvider::class,
+        .....
+]
 ```
 
 
