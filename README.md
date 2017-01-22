@@ -21,8 +21,8 @@ Minecraft auth service
 Required
 --------
 
-a)Install Laravel
-b)Configure connection to MySQL in Laravel
+- Install Laravel.
+- Configure connection to MySQL in Laravel.
 
 Installation
 ------------
@@ -45,7 +45,7 @@ $ composer require "exitialis/mas"
 
 Add to your `config/app.php` file in Laravel. 
 
-``` json
+``` 
 'providers' => [
         .....
          /*
