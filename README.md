@@ -27,6 +27,7 @@ Required
 Installation
 ------------
 
+
 Add the mas package to your `composer.json` file.
 
 ``` json
@@ -38,6 +39,7 @@ Add the mas package to your `composer.json` file.
 ```
 
 Or via the command line in the root of your Laravel installation.
+DON'T USING ROOT USER!
 
 ``` bash
 $ composer require "exitialis/mas"
@@ -56,6 +58,14 @@ Add to your `config/app.php` file in Laravel.
 ]
 ```
 
+Via the command line in the root of your Laravel installation.
+
+``` bash
+$ php artisan migrate
+$ php artisan vendor:publish
+```
+
+PROFIT :)
 
 Testing
 -------
