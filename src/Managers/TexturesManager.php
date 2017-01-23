@@ -90,7 +90,7 @@ class TexturesManager
         $basePath = $this->capePath . '/';
         $path = public_path($basePath . $user->login . $format);
 
-        // Если не найден плащ у пользователя, то возвращаем false.
+        // Если не найден плащ у пользователя, то возвращаем дефолтный.
         if ( ! file_exists($path)) {
             return asset($basePath . $this->cloakDefault . $format);
         }

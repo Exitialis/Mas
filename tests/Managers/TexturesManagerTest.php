@@ -68,6 +68,17 @@ class TexturesManagerTest extends DbTestCase
     }
 
     /**
+     * Тест получения стандартого плаща, если плащ не установлен.
+     */
+    public function testGettingDefaultCloakUrl()
+    {
+        $rightPath = asset(config('mas.textures.path.cloak') . '/' . config('mas.textures.cloak_default') . '.png');
+        $cloak = $this->manager->getCloak($this->user);
+
+        $this->assertEquals($cloak, $rightPath);
+    }
+
+    /**
      * Создать необходимые директории.
      */
     protected function creatingDirs()
