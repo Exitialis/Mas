@@ -8,7 +8,7 @@ Minecraft auth service
 [![License](https://poser.pugx.org/exitialis/mas/license)](https://packagist.org/packages/exitialis/mas)
 [![Monthly Downloads](https://poser.pugx.org/exitialis/mas/d/monthly)](https://packagist.org/packages/exitialis/mas)
 
-The package designed for your site with your minecraft client integration. The package includes the following features:
+The package designed for your site integration with your minecraft client. The package includes the following features:
 
 - Authenticate users from your site, which can work on engines, like WordPress or DLE.
 - Skins and cloaks system for users.
