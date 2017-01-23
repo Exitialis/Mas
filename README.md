@@ -10,6 +10,7 @@ Minecraft auth service
 
 :package_description
 
+- [Required](#required)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
@@ -17,9 +18,15 @@ Minecraft auth service
 - [Credits](#credits)
 - [License](#license)
 
+Required
+--------
+
+- Install Laravel.
+- Configure connection to MySQL in Laravel.
 
 Installation
 ------------
+
 
 Add the mas package to your `composer.json` file.
 
@@ -32,11 +39,80 @@ Add the mas package to your `composer.json` file.
 ```
 
 Or via the command line in the root of your Laravel installation.
+DON'T USING ROOT USER!
 
 ``` bash
 $ composer require "exitialis/mas"
 ```
 
+Add to your `config/app.php` file in Laravel. 
+
+``` 
+'providers' => [
+        .....
+         /*
+         * Package Service Providers...
+         */
+		Exitialis\Mas\MasServiceProvider::class,
+        .....
+]
+```
+
+Via the command line in the root of your Laravel installation.
+
+``` bash
+$ php artisan migrate
+$ php artisan vendor:publish
+```
+
+PROFIT :)
+
+Usage
+-----
+
+Edit your file `config/mas.php` under CMS DLE or WordPress.
+
+DLE:
+```
+    /**
+     * Available hashes:
+     * wp, dle
+     */
+    'hash' => 'dle', 
+
+    'repositories' => [
+        'user' => [
+            'login_column' => 'name',
+            'password_column' => 'password',
+            'table_name' => 'dle_users',
+            'key' => 'user_id',
+        ],
+    ],
+```
+WP:
+```
+    /**
+     * Available hashes:
+     * wp, dle
+     */
+    'hash' => 'wp',
+
+    'repositories' => [
+        'user' => [
+            'login_column' => 'user_login',
+            'password_column' => 'user_pass',
+            'table_name' => 'bjsvyp8zhw_users',
+            'key' => 'ID',
+        ],
+    ],
+```
+Create folders in the folder `public` of your Laravel installation:
+
+- textures/cloak
+- textures/skin
+- cache
+- clients/hash
+- clients/{NAME_CLIENTS} (HiTech, Sandbox, Etc)
 
 Testing
 -------
