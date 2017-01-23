@@ -1,10 +1,8 @@
 <?php
 
+use Exitialis\Mas\Exceptions\TexturesException;
 use Exitialis\Mas\Managers\TexturesManager;
 use Exitialis\Mas\Tests\DbTestCase;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Http\File;
-use Illuminate\Support\Facades\Storage;
 
 class TexturesManagerTest extends DbTestCase
 {
@@ -45,7 +43,7 @@ class TexturesManagerTest extends DbTestCase
     
     public function testGettingDefaultSkinUrl()
     {
-        $rightPath = asset(config('mas.textures.path.skin') . '/' . config('mas.textures.skin_default') . '.png');
+        $rightPath = asset(config('mas.textures.path.skin') . '/' . config('mas.textures.skin_default.name') . '.png');
         $skin = $this->manager->getSkin($this->user);
 
         $this->assertEquals($skin, $rightPath);
@@ -68,14 +66,60 @@ class TexturesManagerTest extends DbTestCase
     }
 
     /**
+     * @expectedException Exitialis\Mas\Exceptions\TexturesException
+     */
+    public function testItShouldThrowExceptionIfSkinPathDoesNotExist()
+    {
+        $manager = new TexturesManager([
+            'path' => [
+                'skin' => 'test',
+            ]
+        ]);
+
+        $manager->getSkin($this->user);
+    }
+
+    /**
+     * @expectedException Exitialis\Mas\Exceptions\TexturesException
+     */
+    public function testItShouldThrowExceptionIfCloakPathDoesNotExist()
+    {
+        $manager = new TexturesManager([
+            'path' => [
+                'cloak' => 'test'
+            ]
+        ]);
+
+        $manager->getCloak($this->user);
+    }
+
+    /**
      * Тест получения стандартого плаща, если плащ не установлен.
      */
     public function testGettingDefaultCloakUrl()
     {
-        $rightPath = asset(config('mas.textures.path.cloak') . '/' . config('mas.textures.cloak_default') . '.png');
+        $rightPath = asset(config('mas.textures.path.cloak') . '/' . config('mas.textures.cloak_default.name') . '.png');
         $cloak = $this->manager->getCloak($this->user);
 
         $this->assertEquals($cloak, $rightPath);
+    }
+
+    public function testSkinDefaultActiveOptionShouldDeactivateGettingDefaultSkinForUser()
+    {
+        $manager = new TexturesManager([
+            'skin_default' => [
+                'active' => false,
+                'name' => 'default'
+            ],
+            'path' => [
+                'skin' => 'textures/skin'
+            ]
+        ]);
+
+        $actual = $manager->getSkin($this->user);
+
+        $this->assertEquals(false, $actual);
+
     }
 
     /**

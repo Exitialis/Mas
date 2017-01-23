@@ -3,6 +3,7 @@
 namespace Exitialis\Mas\Managers;
 
 //TODO: реализовать выдачу из папки cache
+use Exitialis\Mas\Exceptions\TexturesException;
 use Exitialis\Mas\MasKey;
 use Exitialis\Mas\User;
 
@@ -23,18 +24,32 @@ class TexturesManager
     protected $capePath;
 
     /**
-     * Путь до стандартного скина.
+     * Активен ли скин по умолчанию.
      *
-     * @var mixed
+     * @var boolean
      */
-    protected $skinDefault;
+    protected $skinDefaultActive;
 
     /**
-     * Путь до стандартного плаща.
-     * 
-     * @var mixed
+     * Название скина по умолчанию.
+     *
+     * @var string
      */
-    protected $cloakDefaul;
+    protected $skinDefaultName;
+
+    /**
+     * Включен ли плащ по умолчанию.
+     * 
+     * @var boolean
+     */
+    protected $cloakDefaultActive;
+
+    /**
+     * Имя плаща по умолчанию.
+     *
+     * @var string
+     */
+    protected $cloakDefaultName;
 
     /**
      * TexturesManager constructor.
@@ -42,69 +57,36 @@ class TexturesManager
      */
     public function __construct(array $config)
     {
-        $this->skinPath = $config['path']['skin'];
-        $this->capePath = $config['path']['cloak'];
-        $this->skinDefault = $config['skin_default'];
-        $this->cloakDefault = $config['cloak_default'];
+        $this->skinPath = isset($config['path']['skin']) ? $config['path']['skin'] : 'textures/skin';
+        $this->capePath = isset($config['path']['cloak']) ? $config['path']['cloak'] : 'textures/cloak';
+        $this->skinDefaultActive = isset($config['skin_default']['active']) ? $config['skin_default']['active'] : false;
+        $this->skinDefaultName = isset($config['skin_default']['name']) ? $config['skin_default']['name'] : 'default';
+        $this->cloakDefaultActive = isset($config['cloak_default']['active']) ? $config['cloak_default']['active'] : false;
+        $this->cloakDefaultName = isset($config['cloak_default']['name']) ? $config['cloak_default']['name'] : 'default';
     }
 
     /**
      * Получить скин пользователя.
      *
      * @param User $user
+     * @param string $format
      * @return string
      */
-    public function getSkin(User $user)
+    public function getSkin(User $user, $format = 'png')
     {
-        $format = '.png';
-        $basePath = $this->skinPath . '/';
-        $path = public_path($basePath . $user->login . $format);
-
-        // Если не найден скин у пользователя, то подставляем
-        // стандартный скин сервера из конфигов.
-        if ( ! file_exists($path)) {
-            return asset($basePath . $this->skinDefault . $format);
-        }
-
-        $cache_path = public_path('cache/') . md5($user->login . 'skin') . $format;
-
-        //Если нет пути с кэшем, создаем
-        if ( ! file_exists(public_path('cache/'))) {
-            mkdir(public_path('cache/'));
-        }
-
-        copy($path, $cache_path);
-
-        return asset('cache/' . md5($user->login . 'skin') . $format);
+        return $this->getTexture($this->skinPath, $user, $this->skinDefaultActive, $this->skinDefaultName, 'skin', $format);
     }
 
     /**
      * Получить плащ пользоваеля.
      *
      * @param User $user
+     * @param string $format
      * @return bool|string
      */
-    public function getCloak(User $user)
+    public function getCloak(User $user, $format = 'png')
     {
-        $format = '.png';
-        $basePath = $this->capePath . '/';
-        $path = public_path($basePath . $user->login . $format);
-
-        // Если не найден плащ у пользователя, то возвращаем дефолтный.
-        if ( ! file_exists($path)) {
-            return asset($basePath . $this->cloakDefault . $format);
-        }
-
-        $cache_path = public_path('cache/') . md5($user->login . 'cloak') . $format;
-
-        //Если нет пути с кэшем, создаем
-        if ( ! file_exists(public_path('cache/'))) {
-            mkdir(public_path('cache/'));
-        }
-
-        copy($path, $cache_path);
-
-        return asset('cache/' . md5($user->login . 'cloak') . $format);
+        return $this->getTexture($this->capePath, $user, $this->cloakDefaultActive, $this->cloakDefaultName, 'cloak', $format);
     }
 
     /**
@@ -131,5 +113,48 @@ class TexturesManager
             'profileName' => $key->username,
             'textures' => $skin
         ]);
+    }
+
+    /**
+     * Получить текстуру пользователя.
+     *
+     * @param $basePath
+     * @param $defaultTextureName
+     * @param User $user
+     * @param string $textureType skin|cloak
+     * @return string
+     *
+     * @throws TexturesException
+     */
+    private function getTexture($basePath, User $user, $defaultActive = false, $defaultTextureName = 'default', $textureType = 'skin', $format = 'png')
+    {
+        if (substr($basePath, -1) != '/') {
+            $basePath = $basePath . '/';
+        }
+
+        if ( ! file_exists(public_path($basePath))) {
+            throw new TexturesException('Texture path does not exists ' . $basePath);
+        }
+
+        $path = public_path($basePath . $user->login . '.' . $format);
+
+        if ( ! file_exists($path)) {
+            if($defaultActive) {
+                return asset($basePath . $defaultTextureName . '.' . $format);
+            } else {
+                return false;
+            }
+        }
+
+        $cache_path = 'cache/' . md5($user->login . $textureType) . '.' . $format;
+
+        //Если нет пути с кэшем, создаем
+        if ( ! file_exists(public_path('cache/'))) {
+            mkdir(public_path('cache/'));
+        }
+
+        copy($path, public_path($cache_path));
+
+        return asset($cache_path);
     }
 }

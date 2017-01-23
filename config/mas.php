@@ -28,8 +28,14 @@ return [
             'skin' => 'textures/skin',
             'cloak' => 'textures/cloak'
         ],
-        'skin_default' => 'default',
-        'cloak_default' => 'default'
+        'skin_default' => [
+            'active' => true,
+            'name' => 'default'
+        ],
+        'cloak_default' => [
+            'active' => true,
+            'name' => 'default'
+        ]
     ],
 
     'path' => [
