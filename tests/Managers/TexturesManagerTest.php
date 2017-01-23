@@ -22,6 +22,7 @@ class TexturesManagerTest extends DbTestCase
     {
         parent::setUp();
 
+        $this->creatingDirs();
         $this->manager = new TexturesManager(config('mas.textures'));
     }
 
@@ -30,14 +31,14 @@ class TexturesManagerTest extends DbTestCase
      */
     public function testGettingSkinUrl()
     {
-        $this->creatingDirs();
-        $path = public_path('textures/skin/' . $this->user->login . '.png');
+        $login = $this->user->login;
+        $path = public_path('textures/skin/' . $login . '.png');
 
         copy(__DIR__ . '/../test.png', $path);
 
-        $rightPath = asset(config('mas.textures.path.skin') . '/' . $this->user->login . '.png');
+        $rightPath = asset(config('mas.textures.path.skin') . '/' . $login . '.png');
         $skin = $this->manager->getSkin($this->user);
-        //unlink($path);
+        unlink($path);
 
         $this->assertEquals($skin, $rightPath);
     }
@@ -55,11 +56,11 @@ class TexturesManagerTest extends DbTestCase
      */
     public function testGettingCloakUrl()
     {
-        $this->creatingDirs();
-        $path = public_path('textures/cloak/' . $this->user->login . '.png');
+        $login = $this->user->login;
+        $path = public_path('textures/cloak/' . $login . '.png');
 
         copy(__DIR__ . '/../test.png', $path);
-        $rightPath = asset(config('mas.textures.path.cloak') . '/' . $this->user->login . '.png');
+        $rightPath = asset(config('mas.textures.path.cloak') . '/' . $login . '.png');
         $skin = $this->manager->getCloak($this->user);
         unlink($path);
 

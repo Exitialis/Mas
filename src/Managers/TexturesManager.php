@@ -68,6 +68,11 @@ class TexturesManager
 
         $cache_path = public_path('cache/') . md5($user->login . 'skin') . $format;
 
+        //Если нет пути с кэшем, создаем
+        if ( ! file_exists(public_path('cache/'))) {
+            mkdir(public_path('cache/'));
+        }
+
         copy($path, $cache_path);
 
         return asset('cache/' . md5($user->login . 'skin') . $format);
@@ -91,6 +96,11 @@ class TexturesManager
         }
 
         $cache_path = public_path('cache/') . md5($user->login . 'cloak') . $format;
+
+        //Если нет пути с кэшем, создаем
+        if ( ! file_exists(public_path('cache/'))) {
+            mkdir(public_path('cache/'));
+        }
 
         copy($path, $cache_path);
 
