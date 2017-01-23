@@ -58,11 +58,11 @@ class TexturesManager
     {
         $format = '.png';
         $basePath = $this->skinPath . '/';
-        $path = $basePath . $user->login . $format;
+        $path = public_path($basePath . $user->login . $format);
 
         // Если не найден скин у пользователя, то подставляем
         // стандартный скин сервера из конфигов.
-        if ( ! file_exists(public_path($path))) {
+        if ( ! file_exists($path)) {
             return asset($basePath . $this->skinDefault . $format);
         }
 
@@ -88,10 +88,10 @@ class TexturesManager
     {
         $format = '.png';
         $basePath = $this->capePath . '/';
-        $path = $basePath . $user->login . $format;
+        $path = public_path($basePath . $user->login . $format);
 
         // Если не найден плащ у пользователя, то возвращаем false.
-        if ( ! file_exists(public_path($path))) {
+        if ( ! file_exists($path)) {
             return asset($basePath . $this->cloakDefault . $format);
         }
 

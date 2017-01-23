@@ -36,7 +36,7 @@ class TexturesManagerTest extends DbTestCase
 
         copy(__DIR__ . '/../test.png', $path);
 
-        $rightPath = asset(config('mas.textures.path.skin') . '/' . $login . '.png');
+        $rightPath = asset('cache' . '/' . md5($login . 'skin') . '.png');
         $skin = $this->manager->getSkin($this->user);
         unlink($path);
 
@@ -60,7 +60,7 @@ class TexturesManagerTest extends DbTestCase
         $path = public_path('textures/cloak/' . $login . '.png');
 
         copy(__DIR__ . '/../test.png', $path);
-        $rightPath = asset(config('mas.textures.path.cloak') . '/' . $login . '.png');
+        $rightPath = asset('cache' . '/' . md5($login . 'cloak') . '.png');
         $skin = $this->manager->getCloak($this->user);
         unlink($path);
 
