@@ -1,6 +1,7 @@
 <?php namespace Exitialis\Mas\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Exitialis\Mas\Exceptions\TexturesException;
 use Exitialis\Mas\Managers\TexturesManager;
 use Exitialis\Mas\MasKey;
 use Exitialis\Mas\Repository\Contracts\KeyRepositoryInterface;
@@ -31,6 +32,13 @@ class MasClientController extends Controller
     protected $keys;
 
     /**
+     * Менеджер текстур пользователя.
+     *
+     * @var TexturesManager
+     */
+    protected $texturesManager;
+
+    /**
      * MasClientController constructor.
      * @param $users
      * @param $keys
@@ -39,6 +47,7 @@ class MasClientController extends Controller
     {
         $this->users = $users;
         $this->keys = $keys;
+        $this->texturesManager = new TexturesManager(config('mas.textures'));
     }
     
     /**
@@ -86,16 +95,31 @@ class MasClientController extends Controller
         };
 
         $user = $key->user;
+        $login = $user->login;
 
-        $realUser = $user->login;
+        try {
+            $textures = $this->texturesManager->getTextures($user, $key);
+        } catch(TexturesException $e) {
 
-        $manager = new TexturesManager(config('mas.textures'));
+            \Log::error('Textures error: ', ['message' => $e->getMessage()]);
 
-        $textures = $manager->getTextures($user, $key);
+            return json_encode([
+                'id' => $key->uuid,
+                'name' => $login,
+                'properties' => array(
+                    [
+                        'name' => 'textures',
+                        'value' => base64_encode('Error: ' . $e->getMessage()),
+                        'signature' => 'Cg=='
+                    ]
+                )
+            ]);
+        }
+
 
         $output = [
             'id' => $key->uuid,
-            'name' => $realUser,
+            'name' => $login,
             'properties' => array(
                 [
                     'name' => 'textures',
@@ -118,9 +142,7 @@ class MasClientController extends Controller
 
         $realUser = $key->username;
         
-        $manager = new TexturesManager(config('mas.textures'));
-        
-        $base64 = $manager->getTextures($key->user, $key);
+        $base64 = $this->texturesManager->getTextures($key->user, $key);
 
         $output = [
             'id' => $key->uuid,

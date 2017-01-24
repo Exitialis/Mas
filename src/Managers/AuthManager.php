@@ -58,6 +58,10 @@ class AuthManager
             return false;
         }
 
+        if ($user->login !== $login) {
+            return false;
+        }
+
         if ($this->checkPassword($user, $password)) {
             return $this->keys->updateOrCreate($user);
         }

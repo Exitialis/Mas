@@ -97,10 +97,21 @@ class TexturesManager
      */
     public function getTextures(User $user, MasKey $key)
     {
-        $skin = ['SKIN' => ['url' => $this->getSkin($user)]];
+        $skin = [
+            'SKIN' => [
+                'url' => $this->getSkin($user)
+            ]
+        ];
+
         $cloak = null;
+
         if ($cloakUrl = $this->getCloak($user)) {
-            $cloak = ['CAPE' => ['url' => $cloakUrl]];
+            $cloak = [
+                'CAPE' =>
+                    [
+                        'url' => $cloakUrl
+                    ]
+            ];
         }
         
         if ($cloak) {

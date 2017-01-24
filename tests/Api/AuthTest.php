@@ -21,6 +21,19 @@ class AuthTest extends DbTestCase
     }
 
     /**
+     * Авторизация с учетом регистра не должна проходить, если регистр введенных данных не совпадает с регистром в бд.
+     */
+    public function testAuthShouldCheckCaseOfWords()
+    {
+        $this->post(route('mas.auth'), [
+            'login' => strtoupper($this->user->login),
+            'password' => '12345'
+        ], ['Accept' => 'application/json'])->seeStatusCode(200)->see(false)->dontSeeInDatabase('mas_keys', [
+            'user_id' => $this->user->getKey()
+        ]);
+    }
+
+    /**
      * Проверяем валидацию
      */
     public function testAuthLoginValidation()

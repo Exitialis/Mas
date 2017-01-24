@@ -119,7 +119,6 @@ class TexturesManagerTest extends DbTestCase
         $actual = $manager->getSkin($this->user);
 
         $this->assertEquals(false, $actual);
-
     }
 
     /**

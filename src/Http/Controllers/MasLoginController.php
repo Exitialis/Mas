@@ -42,7 +42,7 @@ class MasLoginController extends Controller
         if ( ! $key = $this->auth->login($request->input('login'), $request->input('password'))) {
             return response('false');
         }
-        
+
         return response($key->uuid . "::" . $key->session);
     }
 
