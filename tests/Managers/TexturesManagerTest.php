@@ -127,9 +127,13 @@ class TexturesManagerTest extends DbTestCase
     protected function creatingDirs()
     {
         $path = public_path();
-        if ( ! file_exists(public_path('textures/skin'))) {
+        if ( ! file_exists(public_path('textures'))) {
             mkdir($path . '/textures');
+        }
+        if ( ! file_exists($path . '/textures/skin')) {
             mkdir($path . '/textures/skin');
+        }
+        if ( ! file_exists($path . '/textures/cloak')) {
             mkdir($path . '/textures/cloak');
         }
     }
