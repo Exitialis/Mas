@@ -154,7 +154,54 @@ if ( ! function_exists('hashc')) {
      */
     function hashc($client) {
         $client_path = config("mas.path.clients");
-        $hash_md5 = str_replace("\\", "/",check_files($client_path . '/' .$client.'/bin/').check_files($client_path . '/'.$client.'/mods/').check_files($client_path . '/' .$client.'/coremods/').check_files($client_path . '/' .$client.'/natives/')).'<::>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
+        $hash_md5 = str_replace("\\", "/",check_files($client_path . '/' .$client))."<::>".hashDirectory($client_path . '/' .$client)."<::>".sizeFolder($client_path . '/' .$client);
         return $hash_md5;
+    }
+}
+if (!function_exists('hashDirectory')){
+    /**
+     * Составить md5 папки
+     *
+     * @param $directory
+     * @return string
+     */
+    function hashDirectory($directory){
+        $dir = dir($directory);
+        $files = array();
+
+
+        while (false !== ($file = $dir->read()))
+        {
+            if ($file != '.' and $file != '..')
+            {
+                if (is_dir($directory . '/' . $file))
+                {
+                    $files[] = hashDirectory($directory . '/' . $file);
+                }
+                else
+                {
+                    $files[] = md5_file($directory . '/' . $file);
+                }
+            }
+        }
+
+        $dir->close();
+
+        return md5(implode('',$files));
+    }
+}
+if(!function_exists('sizeFolder')){
+    /**
+     * Размер папки
+     *
+     * @param $directory
+     * @return int
+     */
+    function sizeFolder($directory){
+        $fileSize = 0;
+        foreach (File::allFiles($directory) as $file){
+            $fileSize += $file->getSize();
+        }
+        return $fileSize;
     }
 }
