@@ -11,8 +11,8 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "laravel/framework": "^5.2.43",
-        "illuminate/support": "^5.2.43",
+        "laravel/framework": "^5.3",
+        "illuminate/support": "^5.3",
         "hautelook/phpass": "^1.0"
     },
     "require-dev": {
