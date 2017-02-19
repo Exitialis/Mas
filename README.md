@@ -119,7 +119,7 @@ Create folders in the folder `public` of your Laravel installation:
 - textures/skin
 - cache
 - clients/hash
-- clients/{NAME_CLIENTS} (HiTech, Sandbox, Etc)
+- clients/{NAME_CLIENTS} (HiTech, Sandbox, Assets, Java, Etc)
 
 Testing
 -------
