@@ -10,16 +10,16 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "laravel/framework": "^5.3",
-        "illuminate/support": "^5.3",
+        "php": ">=5.6.0",
+        "laravel/framework": "^5.4.12",
+        "illuminate/support": "^5.4.9",
         "hautelook/phpass": "^1.0",
-        "orchestra/database":"^3.3.6"
+        "orchestra/database":"^3.4.5"
     },
     "require-dev": {
-        "laravel/laravel": "^5.3",
-        "phpunit/phpunit": "^5.5",
-        "orchestra/testbench": "^3.3.6"
+        "laravel/laravel": "^5.4.12",
+        "phpunit/phpunit": "^5.7",
+        "orchestra/testbench": "^3.4.5"
     },
     "autoload": {
           "psr-4": {
