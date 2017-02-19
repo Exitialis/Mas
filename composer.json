@@ -12,9 +12,9 @@
     "require": {
         "php": ">=5.6.0",
         "laravel/framework": "^5.4.12",
-        "illuminate/support": "^5.4.9",
+        "illuminate/support": "^5.4",
         "hautelook/phpass": "^1.0",
-        "orchestra/database":"^3.3.6"
+        "orchestra/database":"3.4.x-dev"
     },
     "require-dev": {
         "laravel/laravel": "^5.4.9",
