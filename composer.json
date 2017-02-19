@@ -13,12 +13,13 @@
         "php": ">=5.4.0",
         "laravel/framework": "^5.3",
         "illuminate/support": "^5.3",
-        "hautelook/phpass": "^1.0"
+        "hautelook/phpass": "^1.0",
+        "orchestra/database":"^3.3.6"
     },
     "require-dev": {
         "laravel/laravel": "^5.3",
         "phpunit/phpunit": "^5.5",
-        "orchestra/testbench": "^3.3"
+        "orchestra/testbench": "^3.3.6"
     },
     "autoload": {
           "psr-4": {
