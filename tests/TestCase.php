@@ -2,25 +2,20 @@
 
 namespace Exitialis\Mas\Tests;
 
-use Exitialis\Mas\User;
-use Faker\Factory;
-use Illuminate\Console;
 use Exitialis\Mas\MasServiceProvider;
+use Faker\Factory;
+use Faker\Generator;
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Session;
-use Orchestra\Testbench\TestCase as Test;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
-class TestCase extends Test
+class TestCase extends BaseTestCase
 {
 
     /**
      * Генератор значений.
      *
-     * @var Faker\Generator
+     * @var Generator
      */
     protected $faker;
 
@@ -29,33 +24,95 @@ class TestCase extends Test
         parent::setUp();
 
         $this->faker = Factory::create();
+
+        $this->app = $this->createApplication();
+
+        $this->setEnvironment();
+
+        $this->loadFactories(__DIR__ . '/../database/factories/');
     }
 
     /**
-     * Подключить service provider пакета.
+     * Creates the application.
      *
-     * @param \Illuminate\Foundation\Application $app
-     * @return array
+     * Needs to be implemented by subclasses.
+     *
+     * @return \Symfony\Component\HttpKernel\HttpKernelInterface
      */
-    protected function getPackageProviders($app)
+    public function createApplication()
     {
-        return [MasServiceProvider::class];
+        $app = require __DIR__.'/../vendor/laravel/laravel/bootstrap/app.php';
+
+        $app->make(Kernel::class)->bootstrap();
+
+        $app->register(MasServiceProvider::class);
+
+        return $app;
     }
+
+    /**
+     * run package database migrations
+     *
+     * @return void
+     */
+    public function migrate()
+    {
+        $fileSystem = new Filesystem;
+
+        foreach($fileSystem->files(__DIR__ . "/../database/migrations/") as $file)
+        {
+            $fileSystem->requireOnce($file);
+            $className = $this->getMigrateClass($file);
+
+            (new $className)->up();
+        }
+    }
+
+    /**
+     * Получить класс для файла миграции.
+     *
+     * @param $fileName
+     * @return mixed
+     */
+    protected function getMigrateClass($fileName)
+    {
+        $name = str_replace('.php', '', $fileName);
+
+        //Разбиваем по _
+        $name = explode('_', $name);
+
+        //Вырезаем дату создания
+        $name = array_slice($name, 4);
+
+        //Склееваем обратно в строку и возвращаем в CamelCase
+        return str_replace(' ', '', ucwords(join(' ', $name)));
+    }
+
+    /**
+     * Загрузить фактори классы.
+     *
+     * @param $path
+     */
+    protected function loadFactories($path)
+    {
+        $this->app->make(\Illuminate\Database\Eloquent\Factory::class)->load($path);
+    }
+
 
     /**
      * Настроить конфиги под тестовое окружение.
-     *
-     * @param \Illuminate\Foundation\Application $app
      */
-    protected function getEnvironmentSetUp($app)
+    protected function setEnvironment()
     {
+        //dd($this->app);
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'test');
-        $app['config']->set('database.connections.test', [
+        $this->app['config']->set('database.default', 'test');
+        $this->app['config']->set('database.connections.test', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
         ]);
     }
+
 
 }

@@ -3,16 +3,9 @@
 namespace Exitialis\Mas\Tests;
 
 use Exitialis\Mas\User;
-use Illuminate\Console;
-use Exitialis\Mas\MasServiceProvider;
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\TestCase as Test;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Session;
 
 
 class DbTestCase extends TestCase
@@ -31,12 +24,7 @@ class DbTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom([
-            '--database' => 'test',
-            '--realpath' => realpath(__DIR__.'/../database/migrations'),
-        ]);
-
-        $this->withFactories(__DIR__.'/../database/factories');
+        $this->migrate();
 
         $this->setupUsers();
     }

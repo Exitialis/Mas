@@ -3,17 +3,11 @@
 use App\Http\Controllers\Controller;
 use Exitialis\Mas\Exceptions\TexturesException;
 use Exitialis\Mas\Managers\TexturesManager;
-use Exitialis\Mas\MasKey;
 use Exitialis\Mas\Repository\Contracts\KeyRepositoryInterface;
 use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
-use Exitialis\Mas\Repository\Eloquent\KeyRepository;
-use Faker\Provider\zh_TW\Text;
 use GuzzleHttp\Client;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
-use Monolog\Logger;
 
 class MasClientController extends Controller
 {
