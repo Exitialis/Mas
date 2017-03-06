@@ -15,9 +15,12 @@ class AuthTest extends DbTestCase
         $this->post(route('mas.auth'), [
             'login' => $this->user->login,
             'password' => '12345'
-        ])->seeStatusCode(200)->dontSee('false')->seeInDatabase('mas_keys', [
+        ])->assertStatus(200)->assertDontSee('false')
+            ->assertSee($this->user->keys->uuid . '::' . $this->user->keys->session);
+
+        $this->assertDatabaseHas('mas_keys', [
             'user_id' => $this->user->getKey()
-        ])->see($this->user->keys->uuid . '::' . $this->user->keys->session);
+        ]);
     }
 
     /**
@@ -28,7 +31,9 @@ class AuthTest extends DbTestCase
         $this->post(route('mas.auth'), [
             'login' => strtoupper($this->user->login),
             'password' => '12345'
-        ], ['Accept' => 'application/json'])->seeStatusCode(200)->see(false)->dontSeeInDatabase('mas_keys', [
+        ], ['Accept' => 'application/json'])->assertStatus(200)->assertSee('false');
+
+        $this->assertDatabaseMissing('mas_keys', [
             'user_id' => $this->user->getKey()
         ]);
     }
@@ -40,7 +45,9 @@ class AuthTest extends DbTestCase
     {
         $this->post(route('mas.auth'), [
             'login' => ''
-        ], ['Accept' => 'application/json'])->seeStatusCode(422)->dontSeeInDatabase('mas_keys', [
+        ], ['Accept' => 'application/json'])->assertStatus(422);
+
+        $this->assertDatabaseMissing('mas_keys', [
             'user_id' => $this->user->getKey()
         ]);
     }
@@ -52,7 +59,9 @@ class AuthTest extends DbTestCase
     {
         $this->post(route('mas.auth'), [
             'password' => ''
-        ], ['Accept' => 'application/json'])->seeStatusCode(422)->dontSeeInDatabase('mas_keys', [
+        ], ['Accept' => 'application/json'])->assertStatus(422);
+
+        $this->assertDatabaseMissing('mas_keys', [
             'user_id' => $this->user->getKey()
         ]);
     }

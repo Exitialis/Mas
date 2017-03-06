@@ -5,7 +5,6 @@ use Exitialis\Mas\Exceptions\TexturesException;
 use Exitialis\Mas\Managers\TexturesManager;
 use Exitialis\Mas\Repository\Contracts\KeyRepositoryInterface;
 use Exitialis\Mas\Repository\Contracts\UserRepositoryInterface;
-use GuzzleHttp\Client;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 

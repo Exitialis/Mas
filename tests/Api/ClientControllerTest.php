@@ -51,7 +51,9 @@ class ClientControllerTest extends DbTestCase
             'selectedProfile' => $user_hash,
             'accessToken' => $accessToken,
             'serverId' => $this->serverId,
-        ])->seeStatusCode(204)->seeInDatabase('mas_keys', [
+        ])->assertStatus(204);
+
+        $this->assertDatabaseHas('mas_keys', [
             'user_id' => $this->user->getKey(),
             'serverId' => $this->serverId
         ]);
@@ -72,12 +74,12 @@ class ClientControllerTest extends DbTestCase
         $this->key->serverid = $this->serverId;
         $this->key->save();
 
-        $response = $this->get(route('mas.hasJoined', [
+        $this->get(route('mas.hasJoined', [
             'username' => $this->key->username,
             'serverId' => $this->serverId,
         ]),[
             'Accept' => 'application/json'
-        ])->seeStatusCode(200)->dontSeeJson(["error" => "Bad login", "errorMessage" => "Bad Login"])->seeJson([
+        ])->assertStatus(200)->assertDontSee(["error" => "Bad login", "errorMessage" => "Bad Login"])->assertJson([
             'id' => $this->key->uuid,
             'name' => $this->key->username,
             'properties' => array(
@@ -115,7 +117,7 @@ class ClientControllerTest extends DbTestCase
             'serverId' => $this->serverId,
         ]),[
             'Accept' => 'application/json'
-        ])->seeStatusCode(200)->dontSeeJson(["error" => "Bad login", "errorMessage" => "Bad Login"])->seeJson([
+        ])->assertStatus(200)->assertDontSee(["error" => "Bad login", "errorMessage" => "Bad Login"])->assertJson([
             'id' => $this->key->uuid,
             'name' => $this->key->username,
             'properties' => array(
