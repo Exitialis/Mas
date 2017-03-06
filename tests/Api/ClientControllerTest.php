@@ -79,7 +79,7 @@ class ClientControllerTest extends DbTestCase
             'serverId' => $this->serverId,
         ]),[
             'Accept' => 'application/json'
-        ])->assertStatus(200)->assertDontSee(["error" => "Bad login", "errorMessage" => "Bad Login"])->assertJson([
+        ])->assertStatus(200)->assertDontSee(json_encode(["error" => "Bad login", "errorMessage" => "Bad Login"]))->assertJson([
             'id' => $this->key->uuid,
             'name' => $this->key->username,
             'properties' => array(
@@ -117,7 +117,7 @@ class ClientControllerTest extends DbTestCase
             'serverId' => $this->serverId,
         ]),[
             'Accept' => 'application/json'
-        ])->assertStatus(200)->assertDontSee(["error" => "Bad login", "errorMessage" => "Bad Login"])->assertJson([
+        ])->assertStatus(200)->assertDontSee(json_encode(["error" => "Bad login", "errorMessage" => "Bad Login"]))->assertJson([
             'id' => $this->key->uuid,
             'name' => $this->key->username,
             'properties' => array(
