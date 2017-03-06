@@ -41,7 +41,7 @@ class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
-        $app = require __DIR__.'/../vendor/laravel/laravel/bootstrap/app.php';
+        $app = require __DIR__ . '/../vendor/laravel/laravel/bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
 
@@ -59,8 +59,7 @@ class TestCase extends BaseTestCase
     {
         $fileSystem = new Filesystem;
 
-        foreach($fileSystem->files(__DIR__ . "/../database/migrations/") as $file)
-        {
+        foreach ($fileSystem->files(__DIR__ . "/../database/migrations/") as $file) {
             $fileSystem->requireOnce($file);
             $className = $this->getMigrateClass($file);
 
@@ -108,10 +107,12 @@ class TestCase extends BaseTestCase
         // Setup default database to use sqlite :memory:
         $this->app['config']->set('database.default', 'test');
         $this->app['config']->set('database.connections.test', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
+
+
     }
 
 
